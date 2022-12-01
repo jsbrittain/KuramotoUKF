@@ -12,3 +12,5 @@ Implemented techniques:
 * Particle Swarm Optimisation (PSO)
 * Gradient Descent (Vanilla, Adam, RMSProp)
 * Custom high-performance Maths library
+
+Original repository with commit history: [[bitbucket.org/jsbrittain/kuramotoukf/src/master/](bitbucket.org/jsbrittain/kuramotoukf/src/master/)].
