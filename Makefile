@@ -2,8 +2,8 @@ CC = g++
 FLAGS = -std=c++17 -c
 
 SOURCEDIR = src
-OBJDIR = obj
 BUILDDIR = build
+OBJDIR = $(BUILDDIR)/obj
 
 EXECUTABLE = kukf
 SOURCES = $(wildcard $(SOURCEDIR)/*.cpp)
