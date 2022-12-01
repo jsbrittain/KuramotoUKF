@@ -13,4 +13,4 @@ Implemented techniques:
 * Gradient Descent (Vanilla, Adam, RMSProp)
 * Custom high-performance Maths library
 
-Original repository with commit history: [[bitbucket.org/jsbrittain/kuramotoukf/src/master/](bitbucket.org/jsbrittain/kuramotoukf/src/master/)].
+Original repository with commit history: [[http://bitbucket.org/jsbrittain/kuramotoukf/src/master/](bitbucket.org/jsbrittain/kuramotoukf/src/master/)].
