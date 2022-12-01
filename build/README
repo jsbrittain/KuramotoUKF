@@ -1,0 +1,1 @@
+This folder is for generating out-of-source builds with cmake (run "cmake ..", "cmake --build ." from within this folder).
