@@ -14,7 +14,7 @@ ParticleSwarmOptimiser::ParticleSwarmOptimiser( int paramcount, Prior* prior ) :
 ParticleSwarmOptimiser::~ParticleSwarmOptimiser() {
     deallocMatrix( &psoparams.velocityMin, paramcount );
     deallocMatrix( &psoparams.velocityMax, paramcount );
-    if ( particle != NULL ) {
+    if ( particle != nullptr ) {
         for ( int k = 0; k < particlecount; k++ ) {
             deallocMatrix(&particle[k].position,paramcount);
             deallocMatrix(&particle[k].velocity,paramcount);

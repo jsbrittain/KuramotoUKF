@@ -26,7 +26,7 @@ void KurRecover::generateData( KuramotoUKF::ModelParamsSimple modelparams, std::
     cout << "Number of priors: " << n_priors << endl;
     
     // Select parameters randomly from prior distributions
-    srand((int)time(NULL));
+    srand((int)time(nullptr));
     if ( modelparams.gen_from_priors_mode == KuramotoUKF::ModelParamsSimple::GenFromPriorsMode::noisy ) {
         for ( int k = 0; k < n_priors; k++ )
             priorvec[k] = kuramoto.randn( prior[k].mu, prior[k].sd );
@@ -64,7 +64,7 @@ void KurRecover::parameterRecovery( KuramotoUKF::ModelParamsSimple modelparams, 
     /// Initialise KuramotoUKF model to get generated parameters (such as prior counts)
     
     // Construct Kuromoto UKF
-    datatype* stateMAP = NULL;
+    datatype* stateMAP = nullptr;
     KuramotoUKF kuramoto( modelparams.kurfparams );
     kuramoto.readMeasurementFile( options.loadfile, 1 );
     if ( options.useRmsSigmay ) {
@@ -100,7 +100,7 @@ void KurRecover::parameterRecovery( KuramotoUKF::ModelParamsSimple modelparams, 
     
     if ( options.do_pso ) {
         KurPSOchains kurpsochains;
-        if ( stateMAP == NULL )
+        if ( stateMAP == nullptr )
             stateMAP = MatrixManip::allocMatrix(n_priors);
         stateMAP = kurpsochains.run( modelparams, kuramoto.n_priors, prior, paramPriorList, n_priors, options.loadfile, options.savedir, options.threadcount );
         // Backup MAP
@@ -111,7 +111,7 @@ void KurRecover::parameterRecovery( KuramotoUKF::ModelParamsSimple modelparams, 
     // Gradient descent
     
     KurGradDescent kurgraddescent( &kuramoto, n_priors, prior, options.grad_method );
-    if ( stateMAP != NULL )
+    if ( stateMAP != nullptr )
         kurgraddescent.setStartingPosition( stateMAP );
     else {
         stateMAP = MatrixManip::allocMatrix(n_priors);
@@ -130,7 +130,7 @@ void KurRecover::parameterRecovery( KuramotoUKF::ModelParamsSimple modelparams, 
     
     // Hessian
     
-    datatype** invhess = NULL;
+    datatype** invhess = nullptr;
     if ( options.do_hess ) {
         kurgraddescent.calcHessian();
         kurgraddescent.saveToFile( kurgraddescent.getHessian(), options.savedir + "/hess.txt" );
@@ -184,7 +184,7 @@ void KurRecover::parameterRecovery( KuramotoUKF::ModelParamsSimple modelparams, 
     mcmcparams.tuningiters   = 100;
     mcmcparams.prior         = prior;
     mcmcparams.statedim      = n_priors;
-    mcmcparams.randseed      = (int) time(NULL);
+    mcmcparams.randseed      = (int) time(nullptr);
     mcmcparams.verbose       = options.verbose;
     mcmcparams.burnin        = options.mcmc.burnin;
     mcmcparams.chainlength   = options.mcmc.chainlength;

@@ -172,8 +172,8 @@ template <class T> void MatrixManip::printVector( int* x, int n ) {
         std::cout << std::fixed << "    " << k << ": " << x[k] << std::endl;
 }
 template <class T> void MatrixManip::printMatrix( T* X, int n ) {
-    if ( X == NULL ) {
-        std::cout << "NULL vector reference!" << std::endl;
+    if ( X == nullptr ) {
+        std::cout << "nullptr vector reference!" << std::endl;
         return;
     }
     printVector( X, n );
@@ -234,26 +234,26 @@ template <class T> T*** MatrixManip::allocMatrix( int dim1, int dim2, int dim3 )
     return M;
 }
 template <class T> void MatrixManip::deallocMatrix( T** M, int dim ) {
-    if ( *M == NULL ) return;
+    if ( *M == nullptr ) return;
     delete[] *M;
-    *M = NULL;
+    *M = nullptr;
 }
 template <class T> void MatrixManip::deallocMatrix( T*** M, int dim1, int dim2 ) {
-    if ( *M == NULL ) return;
+    if ( *M == nullptr ) return;
     for ( int k = 0; k < dim1; k++ )
         delete[] (*M)[k];
     delete[] *M;
-    *M = NULL;
+    *M = nullptr;
 }
 template <class T> void MatrixManip::deallocMatrix( T**** M, int dim1, int dim2, int dim3 ) {
-    if ( *M == NULL ) return;
+    if ( *M == nullptr ) return;
     for ( int i = 0; i < dim1; i++ ) {
         for ( int j = 0; j < dim2; j++ )
             delete[] (*M)[i][j];
         delete[] (*M)[i];
     }
     delete[] *M;
-    *M = NULL;
+    *M = nullptr;
 }
 template <class T> void MatrixManip::uniformrand( int dim1, int dim2, T **u ) {
     for ( int i = 0; i < dim1; i++ ) {
@@ -370,7 +370,7 @@ template <class T> T MatrixManip::logLikeliMVNpersistent( T* x, int n, T* mu, T*
         persistentLogLikeliMVNeT = allocMatrix( 1, n );
         persistentLogLikeliMVNiS = allocMatrix( n, n );
         persistentLogLikeliMVNeiS = allocMatrix(1, n);
-        if ( persistentLogLikeliMVNMahalanobisSqr == NULL ) persistentLogLikeliMVNMahalanobisSqr = allocMatrix(1, 1);
+        if ( persistentLogLikeliMVNMahalanobisSqr == nullptr ) persistentLogLikeliMVNMahalanobisSqr = allocMatrix(1, 1);
         persistentLogLikeliMVNdim = n;
     }
     

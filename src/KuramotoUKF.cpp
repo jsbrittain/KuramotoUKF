@@ -134,7 +134,7 @@ datatype KuramotoUKF::sinT( datatype x ) {
 void KuramotoUKF::readMeasurementFile( const string filename, int n_obs ) {
     datatype num;
     
-    if ( y != NULL ) deallocMatrix(&y, N,n_obs);
+    if ( y != nullptr ) deallocMatrix(&y, N,n_obs);
     
     UnscentedKalmanFilter::n_obs = n_obs;
     assert( n_obs == 1 );		// Only one measurement currently supported
@@ -314,8 +314,8 @@ void KuramotoUKF::formPriors( KuramotoUKF::ModelParamsSimple params ) {
      */
     
     // Clean-out old priors first
-    if ( prior != NULL ) delete[] prior;
-    if ( paramPriorList != NULL ) delete[] paramPriorList;
+    if ( prior != nullptr ) delete[] prior;
+    if ( paramPriorList != nullptr ) delete[] paramPriorList;
     
     // Determine some parameters and set in class
     nodecount = params.nodecount;
@@ -335,7 +335,7 @@ void KuramotoUKF::formPriors( KuramotoUKF::ModelParamsSimple params ) {
     // Form new priors lists
     paramPriorList = new int[n_params];
     prior = new MatrixManip::Prior[n_params];
-    int* blockindices = NULL;
+    int* blockindices = nullptr;
     
     
     
@@ -595,7 +595,7 @@ bool** KuramotoUKF::initCovarMask( int dim1, int dim2, Masktype masktype ) {
     return mask;
 }
 void KuramotoUKF::updateCovarMasks_StateVar( int k, Masktype masktype ) {
-    updateCovarMasks_StateVar( k, masktype, NULL, 0 );
+    updateCovarMasks_StateVar( k, masktype, nullptr, 0 );
 }
 void KuramotoUKF::updateCovarMasks_StateVar( int k, Masktype masktype, int* blockindices, int blockcount ) {
     switch ( masktype ) {

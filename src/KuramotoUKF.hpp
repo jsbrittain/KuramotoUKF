@@ -31,9 +31,9 @@ public:
     datatype nodecountf;
     datatype dt, ycos;
     datatype ascaling;
-    datatype* yGivenX = NULL;
-    int* paramPriorList = NULL;
-    Prior* prior = NULL;
+    datatype* yGivenX = nullptr;
+    int* paramPriorList = nullptr;
+    Prior* prior = nullptr;
     int n_params, n_priors;
     
     struct {

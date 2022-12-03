@@ -26,43 +26,43 @@ static const datatype phase2lookup = TRIGRES/twopi;
 class UnscentedKalmanFilter : public MatrixManip {
 public:
     int n_statevars, n_obs, N, t;	// N = sample count
-    datatype **state = NULL;		// State variables [t,k]
-    datatype **statepred = NULL;
-    datatype ***stateP = NULL;      // State-transition covariance [t,k,k]
-    datatype **ypred = NULL;		// Calculated (predicted) measurements
-    datatype **y = NULL;			// Observed data (fixed)
+    datatype **state = nullptr;		// State variables [t,k]
+    datatype **statepred = nullptr;
+    datatype ***stateP = nullptr;      // State-transition covariance [t,k,k]
+    datatype **ypred = nullptr;		// Calculated (predicted) measurements
+    datatype **y = nullptr;			// Observed data (fixed)
     datatype costable[TRIGRES], sintable[TRIGRES];
     
-    bool** statePmask=NULL;
-    bool** obsPmask=NULL;
-    bool** crossPmask=NULL;
+    bool** statePmask=nullptr;
+    bool** obsPmask=nullptr;
+    bool** crossPmask=nullptr;
     
     int n_sigmavecs;
-    datatype **sigmaX = NULL;		// Sigma vectors [L',k]
-    datatype **sigmaXpred = NULL;
-    datatype **sigmaXpredMS = NULL;
-    datatype **sigmasqrtP = NULL;
-    datatype *sigmaWc = NULL;
-    datatype *sigmaWm = NULL;
-    datatype **sigmaY = NULL;
-    datatype **sigmaYpredMS = NULL;
-    datatype ***sigmaPcovarX = NULL;
-    datatype ***sigmaPcovarY = NULL;
-    datatype ***sigmaPcovarXY = NULL;
-    datatype ***statePXXpred = NULL;
-    datatype ***statePXYpred = NULL;
-    datatype ***statePYYpred = NULL;
-    datatype **stateNoise = NULL;
-    datatype **obsNoise = NULL;
-    datatype **PyyInv = NULL;
-    datatype *ydiff = NULL;
-    datatype **K = NULL;
-    datatype **KT = NULL;
-    datatype **PyyKT = NULL;
-    datatype **KPyyKT = NULL;
-    datatype **L = NULL;
-    datatype **Linv = NULL;
-    datatype **LinvT = NULL;
+    datatype **sigmaX = nullptr;		// Sigma vectors [L',k]
+    datatype **sigmaXpred = nullptr;
+    datatype **sigmaXpredMS = nullptr;
+    datatype **sigmasqrtP = nullptr;
+    datatype *sigmaWc = nullptr;
+    datatype *sigmaWm = nullptr;
+    datatype **sigmaY = nullptr;
+    datatype **sigmaYpredMS = nullptr;
+    datatype ***sigmaPcovarX = nullptr;
+    datatype ***sigmaPcovarY = nullptr;
+    datatype ***sigmaPcovarXY = nullptr;
+    datatype ***statePXXpred = nullptr;
+    datatype ***statePXYpred = nullptr;
+    datatype ***statePYYpred = nullptr;
+    datatype **stateNoise = nullptr;
+    datatype **obsNoise = nullptr;
+    datatype **PyyInv = nullptr;
+    datatype *ydiff = nullptr;
+    datatype **K = nullptr;
+    datatype **KT = nullptr;
+    datatype **PyyKT = nullptr;
+    datatype **KPyyKT = nullptr;
+    datatype **L = nullptr;
+    datatype **Linv = nullptr;
+    datatype **LinvT = nullptr;
     datatype clambda, calpha, cbeta, ckappa;
     datatype sqrtPscaling;
     

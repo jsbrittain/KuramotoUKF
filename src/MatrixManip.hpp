@@ -31,11 +31,11 @@ private:
     datatype logtwopi;
     
     int persistentLogLikeliMVNdim = -1;
-    datatype** persistentLogLikeliMVNe = NULL;
-    datatype** persistentLogLikeliMVNeT = NULL;
-    datatype** persistentLogLikeliMVNiS = NULL;
-    datatype** persistentLogLikeliMVNeiS = NULL;
-    datatype** persistentLogLikeliMVNMahalanobisSqr = NULL;
+    datatype** persistentLogLikeliMVNe = nullptr;
+    datatype** persistentLogLikeliMVNeT = nullptr;
+    datatype** persistentLogLikeliMVNiS = nullptr;
+    datatype** persistentLogLikeliMVNeiS = nullptr;
+    datatype** persistentLogLikeliMVNMahalanobisSqr = nullptr;
 public:
     
     struct Prior {

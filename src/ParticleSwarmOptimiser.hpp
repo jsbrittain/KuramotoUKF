@@ -21,19 +21,19 @@ public:
         datatype convthreshold = (0.01)/100;
     };
     struct particleStruct {
-        datatype* position = NULL;
-        datatype* velocity = NULL;
+        datatype* position = nullptr;
+        datatype* velocity = nullptr;
         datatype cost;
-        int* neighbour = NULL;
+        int* neighbour = nullptr;
         struct {
-            datatype* position = NULL;
-            datatype* velocity = NULL;
+            datatype* position = nullptr;
+            datatype* velocity = nullptr;
             datatype cost;
         } best, neighbourhoodbest;
     };
     
     int paramcount;
-    particleStruct* particle = NULL;
+    particleStruct* particle = nullptr;
     particleStruct globalbest, localbest;
     Prior* prior;
     

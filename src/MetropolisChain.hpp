@@ -16,11 +16,11 @@
 
 class MetropolisChain : public MatrixManip {
 public:
-    Prior* prior = NULL;
+    Prior* prior = nullptr;
     
     struct MetropolisChainParams {
-        datatype* state0 = NULL;
-        datatype** covarProposal = NULL;
+        datatype* state0 = nullptr;
+        datatype** covarProposal = nullptr;
         bool tuneProposal = false;
         int tuningiters = NAN;
         Prior* prior;
@@ -37,11 +37,11 @@ public:
     int statedim;
     int chaint;
     int verbose = 0;
-    datatype* state0 = NULL;
-    datatype** stateCurrent = NULL;       // Allocate new memory block (may be running chains in parallel)
-    datatype* stateNegLogLikeli = NULL;
-    datatype* stateProposal = NULL;       //  |
-    datatype** covarProposal = NULL;
+    datatype* state0 = nullptr;
+    datatype** stateCurrent = nullptr;       // Allocate new memory block (may be running chains in parallel)
+    datatype* stateNegLogLikeli = nullptr;
+    datatype* stateProposal = nullptr;       //  |
+    datatype** covarProposal = nullptr;
     bool tuneProposal = false;
     int tuningiters = 0;
     datatype logPcurrent, logPproposal, logPcrit;

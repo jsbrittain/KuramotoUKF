@@ -49,10 +49,10 @@ datatype* KurPSOchains::run( KuramotoUKF::ModelParamsSimple modelparams, int par
     // Form pointer array for return values from threads
     datatype** maps = new datatype*[threadcount];
     for ( int k = 0; k < threadcount; k++ )
-        maps[k] = NULL;
+        maps[k] = nullptr;
     datatype** costs = new datatype*[threadcount];
     for ( int k = 0; k < threadcount; k++ )
-        costs[k] = NULL;
+        costs[k] = nullptr;
     
     // Initialise threads list
     std::thread* psoThreads = new std::thread[threadcount];

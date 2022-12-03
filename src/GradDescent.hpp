@@ -21,8 +21,8 @@ class GradDescent {
 public:
     bool verbose = false;
     int paramcount;
-    MatrixManip::Prior* prior = NULL;
-    datatype* x = NULL;
+    MatrixManip::Prior* prior = nullptr;
+    datatype* x = nullptr;
     datatype cost = 0;
     datatype momentumcoeff = 0.9;
     datatype learningrate = 0.1;

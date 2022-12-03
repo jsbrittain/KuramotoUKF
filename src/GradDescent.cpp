@@ -25,7 +25,7 @@ void GradDescent::usePriorsForStartingPosition( ) {
 }
 void GradDescent::run() {
     
-    // Check that method is not null (passthrough)
+    // Check that method is not nullptr (passthrough)
     if ( method == passthrough ) {
         cost = costFunction(x, prior, paramcount);
         return;
