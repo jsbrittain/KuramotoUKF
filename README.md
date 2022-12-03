@@ -14,3 +14,21 @@ Implemented techniques:
 * Custom high-performance Maths library
 
 Original repository with commit history: [[bitbucket.org/jsbrittain/kuramotoukf/src/master/](http://bitbucket.org/jsbrittain/kuramotoukf/src/master/)].
+
+### Build instructions
+
+Out of source build:
+```
+cd build
+cmake ..
+cmake --build .
+```
+
+This generates the executable `kukf` in the build folder.
+
+### Usage
+
+`kukf <data-folder>`
+
+If <data-folder> contains a file named `y.txt` that contains ascii numeric data, then that data is read as a univariate time-series for simulation. If the folder does not contain this file, then surrogate data is generated and fit by the KuramotoUKF procedure.
+

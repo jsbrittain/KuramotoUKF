@@ -21,7 +21,7 @@ KuramotoUKF::ModelParamsSimple specifyModelParams( ) {
     
     modelparams.nodecount              = 3;
     modelparams.n_obs                  = 1;
-    modelparams.covarMask              = KuramotoUKF::Masktype::diagonal;
+    modelparams.covarMask              = KuramotoUKF::Masktype::full;
     modelparams.feedbacklag_secs_min   = 0.050;
     modelparams.feedback_obs_chan      = 0;
     
@@ -65,39 +65,52 @@ int main(int argc, const char * argv[]) {
             3) Multiple datasets; hierarchical model
             4) Working covar masks
     */
+
+    // Check input arguments
+    if ( argc < 2 ) {
+        std::cout
+          << "Data folder should be specified:" << std::endl
+          << "  ./kukf data_folder" << std::endl << std::endl
+          << "If data_folder/y.txt exists and contains a time-series vector" << std::endl
+          << "  then this file is read. Otherwise, surrogate data in generated" << std::endl
+          << "  and placed into the data_folder." << std::endl;
+        return 1;
+    }
     
     // General settings
-    std::string savedir = "/Users/jsb/mcmc/results/surr2";
+    std::string savedir = argv[1];
     
     // Setup model specification
     KuramotoUKF::ModelParamsSimple modelparams = specifyModelParams();
     KurRecover kurrec;
     KurRecover::Options recopts;
     
-    // Generate data to recover
-    bool generate_surrogate_data = true;
-    if ( generate_surrogate_data ) {
+    // Check if data folder contain a valid data file...
+    bool generate_surrogate_data = false;
+    recopts.loadfile = savedir + "/y.txt";
+    if (FILE *file = fopen(recopts.loadfile.c_str(), "r")) {
+        // File exists, read in later
+        fclose(file);
+    } else {
+        // ...otherwise, generate data to recover...
+        generate_surrogate_data = true;
         kurrec.generateData( modelparams, savedir );
         recopts.loadfile = savedir + "/gen_y.txt";
         recopts.useRmsSigmay = false;
-    } else {
-        recopts.loadfile = "/Users/jsb/mcmc/y.txt";
-        //recopts.loadfile = "/Users/jsb/mcmc/y_gap.txt";
-        //recopts.loadfile = savedir + "/gen_y.txt";
     }
-    
+
     // Specify recovery params
     recopts.savedir       = savedir;
     recopts.initstatefile = savedir + "/out_params.txt";
     recopts.threadcount   = 3;
-    recopts.do_pso        = false;
-    recopts.grad_method   = GradDescent::passthrough;    // Usually passthrough or adam
-    recopts.do_hess       = false;
-    recopts.do_mcmc       = false;
+    recopts.do_pso        = true;
+    recopts.grad_method   = GradDescent::adam;//passthrough;
+    recopts.do_hess       = true;
+    recopts.do_mcmc       = true;
     recopts.verbose       = true;
     recopts.mcmc.tuneProposal = false;
     recopts.mcmc.proposalfile = "";//savedir + "/out_tuned_proposal.txt";
-    recopts.mcmc.burnin   = 0;
+    recopts.mcmc.burnin   = 1e3;
     recopts.mcmc.chainlength = 1e4;
     
     // Attempt full parameter recovery
