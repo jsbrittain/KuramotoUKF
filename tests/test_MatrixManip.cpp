@@ -2,7 +2,7 @@
 #include "doctest.h"
 
 #include <limits>
-#include "../MatrixManip.hpp"
+#include "../src/MatrixManip.hpp"
 
 template<class T>
 T abs(T a) {

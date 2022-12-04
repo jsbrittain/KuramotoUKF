@@ -17,7 +17,7 @@
 
 template <class T> void MatrixManip::cholesky(T **A, int n, T** L) {
     // (L)(L)^T = A
-    // A = input matrix, n = (n x n) dimensionality, tindex = time index in to A, L = output matrix
+    // A = input matrix, n = (n x n) dimensionality, L = output matrix
     int i,j,k;
     T s;
     for (i = 0; i < n; i++) {
@@ -28,7 +28,6 @@ template <class T> void MatrixManip::cholesky(T **A, int n, T** L) {
             L[i][j] = (i == j) ? sqrt(A[i][i] - s) : (1.0 / L[j][j] * (A[i][j] - s));
         }
     }
-    //return;
 }
 template <class T> T** MatrixManip::mateye( int n ) {
     return mateye<T>( n, (T) 1.0 );

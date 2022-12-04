@@ -77,7 +77,7 @@ void ParticleSwarmOptimiser::initialise() {
         // Repeat until particle has a valid cost
         particle[k].cost = NAN;
         int attempt_count = 0;
-        while ( isnan(particle[k].cost) ) {
+        while ( std::isnan(particle[k].cost) ) {
             // Try initialising each particle at most 15 times
             if ( (attempt_count++) > 15 )
                 break;
@@ -186,7 +186,7 @@ void ParticleSwarmOptimiser::run() {
             particle[k].cost = costFunction( particle[k].position, prior, paramcount );
             
             // If cost function is NaN, revert particle to previous best
-            if ( isnan( particle[k].cost ) ) {
+            if ( std::isnan( particle[k].cost ) ) {
                 for ( int i = 0; i < paramcount; i++ ) {
                     particle[k].position[i] = particle[k].best.position[i];
                     particle[k].velocity[i] = particle[k].best.velocity[i];

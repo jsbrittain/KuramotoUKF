@@ -115,7 +115,7 @@ void GradDescent::run() {
         
         // Prevent divergence
         lastcost = cost;
-        if (( !isnan(newcost) ) && (newcost < cost)) {
+        if (( !std::isnan(newcost) ) && (newcost < cost)) {
             for ( int i = 0; i < paramcount; i++ ) {
                 x[i] = newx[i];
                 v[i] = newv[i];

@@ -180,7 +180,7 @@ void UnscentedKalmanFilter::update() {
     matmult( statePXYpred[t], n_statevars, n_obs, PyyInv, n_obs, n_obs, K );
     
     // Check for missing data
-    if ( isnan(y[t][0]) ) {      // Need to check what to do if only one channel data missing
+    if ( std::isnan(y[t][0]) ) {      // Need to check what to do if only one channel data missing
         // Update states without measurement data: x[k] = xp[k]
         for ( int k = 0; k < n_statevars; k++ ) {
             state[t][k] = statepred[t][k];

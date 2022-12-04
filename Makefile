@@ -1,25 +1,13 @@
-CC = g++
-FLAGS = -std=c++17 -g -c
-
-SOURCEDIR = src
-BUILDDIR = build
-OBJDIR = $(BUILDDIR)/obj
-
-EXECUTABLE = kukf
-SOURCES = $(wildcard $(SOURCEDIR)/*.cpp)
-OBJECTS = $(patsubst $(SOURCEDIR)/%.cpp,$(OBJDIR)/%.o,$(SOURCES))
-
-all: dir $(BUILDDIR)/$(EXECUTABLE)
-
-dir:
-	mkdir -p $(BUILDDIR) $(OBJDIR)
-
-$(BUILDDIR)/$(EXECUTABLE): $(OBJECTS)
-	$(CC) $^ -o $@
-
-$(OBJECTS): $(OBJDIR)/%.o : $(SOURCEDIR)/%.cpp
-	$(CC) $(FLAGS) $< -o $@
-
-.PHONY: clean
+#SUBDIRS = src tests
+all:
+	make -C ./src
+	make -C ./tests    
+install:
+	make -C ./src install
+uninstall:
+	make -C ./src uninstall
 clean:
-	rm -f $(OBJDIR)/*.o $(BUILDDIR)/$(EXECUTABLE)
+	make -C ./src clean
+test:
+	make -C ./tests
+	make -C ./tests run
