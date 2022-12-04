@@ -2,7 +2,7 @@ CC = g++
 FLAGS = -std=c++17 -O3 -c
 
 SOURCEDIR = .
-BUILDDIR = build
+BUILDDIR = ../build
 OBJDIR = $(BUILDDIR)/obj
 
 EXECUTABLE = kukf

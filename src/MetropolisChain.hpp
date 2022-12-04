@@ -22,9 +22,9 @@ public:
         datatype* state0 = nullptr;
         datatype** covarProposal = nullptr;
         bool tuneProposal = false;
-        int tuningiters = NAN;
+        int tuningiters = 0;
         Prior* prior;
-        int statedim = NAN;
+        int statedim = 0;
         int randseed = 0;
         int burnin = 200;
         int chainlength = 3000;
