@@ -63,7 +63,7 @@ public:
     
     MatrixManip();
     ~MatrixManip();
-    static void cholesky(M2 A, M2 L);
+    static void cholesky(M2 A, M2& L);
     static M2 mateye( int n );
     static M2 mateye( int n, datatype value );
     static void mattranspose( M2 A, M2 D );
@@ -92,7 +92,7 @@ public:
     static void deallocMatrix( M1 M );
     static void deallocMatrix( M2 M );
     static void deallocMatrix( M3 M );
-    void uniformrand( int dim1, int dim2, M2 u );
+    void uniformrand( int dim1, int dim2, M2& u );
     void boxmuller( M2 u, int dim, M1& z );
     void mvnrand( M1 mu, int dim, M2 Sigma, datatype& x );
     void mvnrand( M1 mu, int dim, M2 Sigma, M1& x );

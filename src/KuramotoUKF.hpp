@@ -127,8 +127,8 @@ public:
     ~KuramotoUKF();
     void initialise();
     void initialise( int n_obs, int samplecount );
-    void stateTransitionFunction( M1 x, M1 xpred ) override;
-    void observationFunction( M1 x, M1 y ) override;
+    void stateTransitionFunction( M1 x, M1& xpred ) override;
+    void observationFunction( M1 x, M1& y ) override;
     datatype cosT( datatype x );
     datatype sinT( datatype x );
     void readMeasurementFile( const string filename, int n_obs );

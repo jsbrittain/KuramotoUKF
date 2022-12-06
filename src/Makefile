@@ -1,5 +1,5 @@
 CC = g++
-FLAGS = -std=c++17 -g -c
+FLAGS = -std=c++17 -O3 -c
 
 SOURCEDIR = .
 BUILDDIR = ../build
@@ -13,6 +13,8 @@ all: dir $(BUILDDIR)/$(EXECUTABLE)
 
 dir:
 	mkdir -p $(BUILDDIR) $(OBJDIR)
+
+debug: FLAGS += -DDEBUG -g
 
 $(BUILDDIR)/$(EXECUTABLE): $(OBJECTS)
 	$(CC) -g $^ -o $@

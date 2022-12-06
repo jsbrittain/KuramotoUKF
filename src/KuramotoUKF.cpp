@@ -40,7 +40,7 @@ void KuramotoUKF::initialise( ) {
     UnscentedKalmanFilter::initialise();
     yGivenX = allocMatrix(n_obs);
 }
-void KuramotoUKF::stateTransitionFunction( M1 x, M1 xpred ) {
+void KuramotoUKF::stateTransitionFunction( M1 x, M1& xpred ) {
     // Check for sensory feedback
     if ( paramindex.feedbackStrength != -1 ) {
         // Calculate average phase and resultant magnitude from # steps back
@@ -93,7 +93,7 @@ void KuramotoUKF::stateTransitionFunction( M1 x, M1 xpred ) {
     for ( int k = nodecount; k < n_statevars; k++ )
         xpred[k] = x[k];
 }
-void KuramotoUKF::observationFunction( M1 x, M1 y ) {
+void KuramotoUKF::observationFunction( M1 x, M1& y ) {
     // Oscillator nodes
     y[0] = 0.0;
     for (int k=0; k<nodecount; k++) {

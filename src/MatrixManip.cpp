@@ -14,7 +14,7 @@ MatrixManip::MatrixManip() {
 MatrixManip::~MatrixManip() {
 }
 
-void MatrixManip::cholesky(M2 A, M2 L) {
+void MatrixManip::cholesky(M2 A, M2& L) {
     // (L)(L)^T = A
     // A = input matrix, n = (n x n) dimensionality, L = output matrix
     int n = A.size();
@@ -242,7 +242,7 @@ void MatrixManip::deallocMatrix( M2 M ) {
 }
 void MatrixManip::deallocMatrix( M3 M ) {
 }
-void MatrixManip::uniformrand( int dim1, int dim2, M2 u ) {
+void MatrixManip::uniformrand( int dim1, int dim2, M2& u ) {
     for ( int i = 0; i < dim1; i++ ) {
         for ( int j = 0; j < dim2; j++ )
             u[i][j] = (static_cast<datatype>(rand()))/RAND_MAX;       // (0,1)
@@ -255,8 +255,8 @@ void MatrixManip::boxmuller( M2 u, int dim, M1& z ) {
 }
 void MatrixManip::mvnrand( M1 mu, int dim, M2 Sigma, datatype& x ) {
   M1 Mx(1);
-  Mx[0] = x;
   mvnrand(mu, dim, Sigma, Mx);
+  x = Mx[0];
 }
 void MatrixManip::mvnrand( M1 mu, int dim, M2 Sigma, M1& x ) {
     /*  1.  Find any real matrix A such that A AT = Σ.
