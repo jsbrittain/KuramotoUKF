@@ -8,7 +8,7 @@
 
 #include "KurPSO.hpp"
 
-KurPSO::KurPSO( KuramotoUKF& kurf, int paramcount, std::vector<Prior> prior )
+KurPSO::KurPSO( KuramotoUKF kurf, int paramcount, std::vector<Prior> prior )
   : kurf(kurf), ParticleSwarmOptimiser( paramcount, prior ) {
     //
 }
