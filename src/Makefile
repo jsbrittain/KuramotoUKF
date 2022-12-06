@@ -1,5 +1,5 @@
 CC = g++
-FLAGS = -std=c++17 -O3 -c
+FLAGS = -std=c++17 -g -c
 
 SOURCEDIR = .
 BUILDDIR = ../build
@@ -15,7 +15,7 @@ dir:
 	mkdir -p $(BUILDDIR) $(OBJDIR)
 
 $(BUILDDIR)/$(EXECUTABLE): $(OBJECTS)
-	$(CC) $^ -o $@
+	$(CC) -g $^ -o $@
 
 $(OBJECTS): $(OBJDIR)/%.o : $(SOURCEDIR)/%.cpp
 	$(CC) $(FLAGS) $< -o $@

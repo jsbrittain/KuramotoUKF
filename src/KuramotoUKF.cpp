@@ -644,7 +644,7 @@ void KuramotoUKF::printStateCond( stateConditions* statecond ) {
 }
 M1 KuramotoUKF::priorsToPriorVec( Prior* prior, int* n_priors ) {
     (*n_priors) = KuramotoUKF::n_priors;
-    M1 x;
+    M1 x(*n_priors);
     for ( int k = 0; k < *n_priors; k++ )
         x[k] = prior[k].mu;
     return x;
