@@ -33,9 +33,9 @@ public:
     M2 y;			// Observed data (fixed)
     datatype costable[TRIGRES], sintable[TRIGRES];
     
-    bool** statePmask=nullptr;
-    bool** obsPmask=nullptr;
-    bool** crossPmask=nullptr;
+    std::vector<std::vector<bool>> statePmask;
+    std::vector<std::vector<bool>> obsPmask;
+    std::vector<std::vector<bool>> crossPmask;
     
     int n_sigmavecs;
     M2 sigmaX;		// Sigma vectors [L',k]

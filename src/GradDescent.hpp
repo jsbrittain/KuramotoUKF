@@ -21,7 +21,7 @@ class GradDescent {
 public:
     bool verbose = false;
     int paramcount;
-    MatrixManip::Prior* prior = nullptr;
+    std::vector<MatrixManip::Prior> prior;
     M1 x;
     datatype cost = 0;
     datatype momentumcoeff = 0.9;
@@ -37,9 +37,9 @@ public:
     // Adam parameters
     datatype beta1 = 0.9, beta2 = 0.999, epsilon = 1e-8;
     
-    GradDescent( int paramcount, MatrixManip::Prior* prior );
-    GradDescent( int paramcount, MatrixManip::Prior* prior, Method method );
-    virtual datatype costFunction( M1 state, MatrixManip::Prior* prior, int n ) { return 0; };
+    GradDescent( int paramcount, std::vector<MatrixManip::Prior> prior );
+    GradDescent( int paramcount, std::vector<MatrixManip::Prior> prior, Method method );
+    virtual datatype costFunction( M1 state, std::vector<MatrixManip::Prior> prior, int n ) { return 0; };
     void setStartingPosition( M1 x0 );
     void usePriorsForStartingPosition( );
     void run();

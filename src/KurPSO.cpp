@@ -8,9 +8,10 @@
 
 #include "KurPSO.hpp"
 
-KurPSO::KurPSO( KuramotoUKF* kurf, int paramcount, Prior* prior ) : kurf(*kurf), ParticleSwarmOptimiser( paramcount, prior ) {
+KurPSO::KurPSO( KuramotoUKF& kurf, int paramcount, std::vector<Prior> prior )
+  : kurf(kurf), ParticleSwarmOptimiser( paramcount, prior ) {
     //
 }
-datatype KurPSO::costFunction( M1 state, Prior* prior, int n ) {
-    return kurf.negLogLikeliFcn( state, prior, n );
+datatype KurPSO::costFunction( M1 state, std::vector<Prior> prior, int n ) {
+    return kurf.negLogLikeliFcn( state, prior );
 }

@@ -246,10 +246,6 @@ void UnscentedKalmanFilter::checkCholesky() {
     printMatrix( Y2 );
     std::cout << "Should be (5 decimal places):" << std::endl;
     printMatrix( LX2correct );
-    
-    deallocMatrix(X2);
-    deallocMatrix(LX2correct);
-    deallocMatrix(Y2);
 }
 void UnscentedKalmanFilter::checkMatMultiply() {
     datatype Xk[2][3] = { { 1, 2, 3 }, { 4, 5, 6 } };
@@ -295,10 +291,6 @@ void UnscentedKalmanFilter::checkMatInv() {
     printMatrix( Y );
     std::cout << "Shoud be:" << std::endl;
     printMatrix( Ycorrect );
-    
-    deallocMatrix( X );
-    deallocMatrix( Y );
-    deallocMatrix( Ycorrect );
     
     datatype X2k[3][3] = { { 2, 0, 0 }, { 0, 10, 0 }, { 0, 0, 0.5 } };
     M2 X2 = allocMatrix(3,3);

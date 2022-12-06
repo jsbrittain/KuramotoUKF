@@ -79,7 +79,6 @@ public:
     static void matadd( M2 A, M2 B, M2& D );
     static void matsub( M2 A, M2 B, M2& D );
     static void printVector( M1 x );
-    static void printVector( int* x, int n );
     static void printMatrix( M1 X );
     static void printMatrix( M2 X );
     static void outerproduct( M1 x, M2& D );
@@ -89,9 +88,6 @@ public:
     static M1 allocMatrix( int dim );
     static M2 allocMatrix( int dim1, int dim2 );
     static M3 allocMatrix( int dim1, int dim2, int dim3 );
-    static void deallocMatrix( M1 M );
-    static void deallocMatrix( M2 M );
-    static void deallocMatrix( M3 M );
     void uniformrand( int dim1, int dim2, M2& u );
     void boxmuller( M2 u, int dim, M1& z );
     void mvnrand( M1 mu, int dim, M2 Sigma, datatype& x );
@@ -105,9 +101,9 @@ public:
     void testRandomNumberGenerators( const std::string filestem );
     void writeMatrixToFile( const std::string filename, M2 x, int dim1, int dim2 );
     static datatype normLikeli( datatype x, datatype mu, datatype sd );
-    static datatype logLikeliPriors( M1 state, Prior* prior, int n );
-    static void printPriors( Prior* prior, int n );
-    static datatype matrms( M1 x, int n );
+    static datatype logLikeliPriors( M1 state, std::vector<Prior> prior );
+    static void printPriors( std::vector<Prior> prior );
+    static datatype matrms( M1 x );
     static void saveVectorToTextFile( std::string filename, M1 D );
     static void saveMatrixToTextFile( std::string filename, M1 D );
     static M1 loadVectorFromTextFile( std::string filename, int expected_dim );

@@ -8,7 +8,8 @@
 
 #include "ParticleSwarmOptimiser.hpp"
 
-ParticleSwarmOptimiser::ParticleSwarmOptimiser( int paramcount, Prior* prior ) : paramcount(paramcount), prior(prior) {
+ParticleSwarmOptimiser::ParticleSwarmOptimiser( int paramcount, std::vector<Prior> prior )
+  : paramcount(paramcount), prior(prior) {
     //
 }
 ParticleSwarmOptimiser::~ParticleSwarmOptimiser() {
@@ -48,7 +49,7 @@ void ParticleSwarmOptimiser::initialise() {
         std::cout << "Initialising " << particlecount << " particles..." << std::endl;
     
     // Construct particles
-    particle = new particleStruct[particlecount];
+    particle = std::vector<particleStruct>(particlecount);
     for ( int k = 0; k < particlecount; k++ ) {
         // Location
         particle[k].position = allocMatrix(paramcount);
@@ -73,7 +74,7 @@ void ParticleSwarmOptimiser::initialise() {
         }
         
         // Define neighbours
-        particle[k].neighbour = new int[neighbours];
+        particle[k].neighbour = std::vector<int>(neighbours);
         for( int i = 0; i < neighbours; i++ ) {
             int x = k+i-1-2*floor(neighbours/2)+neighbours;
             // Neighbours include a self-reference

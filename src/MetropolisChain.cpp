@@ -11,7 +11,7 @@
 MetropolisChain::MetropolisChain( MetropolisChainParams mcmcparams) : state0(mcmcparams.state0), statedim(mcmcparams.statedim), covarProposal(mcmcparams.covarProposal), tuneProposal(mcmcparams.tuneProposal), tuningiters(mcmcparams.tuningiters), prior(mcmcparams.prior), randseed(mcmcparams.randseed), burnin(mcmcparams.burnin), chainlength(mcmcparams.chainlength), verbose(mcmcparams.verbose) {
     initialise();
 }
-MetropolisChain::MetropolisChain( M1 state0, M2 covarProposal, bool tuneProposal, int tuningiters, Prior* prior, int statedim, int randseed, int burnin, int chainlength, int verbose ) : state0(state0), statedim(statedim), covarProposal(covarProposal), tuneProposal(tuneProposal), tuningiters(tuningiters), prior(prior), randseed(randseed), burnin(burnin), chainlength(chainlength), verbose(verbose) {
+MetropolisChain::MetropolisChain( M1 state0, M2 covarProposal, bool tuneProposal, int tuningiters, std::vector<Prior>& prior, int statedim, int randseed, int burnin, int chainlength, int verbose ) : state0(state0), statedim(statedim), covarProposal(covarProposal), tuneProposal(tuneProposal), tuningiters(tuningiters), prior(prior), randseed(randseed), burnin(burnin), chainlength(chainlength), verbose(verbose) {
     initialise();
 }
 MetropolisChain::~MetropolisChain()
@@ -256,7 +256,7 @@ M1 MetropolisChain::getMAPstate( ) {
         }
     }
     // Allocate new memory for return
-    M1 MAPstate;// = new datatype[statedim];
+    M1 MAPstate;
     for ( int k = 0; k < statedim; k++ )
         MAPstate[k] = stateCurrent[bestpos][k];
     return MAPstate;

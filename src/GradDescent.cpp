@@ -8,10 +8,12 @@
 
 #include "GradDescent.hpp"
 
-GradDescent::GradDescent( int paramcount, MatrixManip::Prior* prior ) : paramcount(paramcount), prior(prior) {
+GradDescent::GradDescent( int paramcount, std::vector<MatrixManip::Prior> prior )
+  : paramcount(paramcount), prior(prior) {
     //
 }
-GradDescent::GradDescent( int paramcount, MatrixManip::Prior* prior, Method method ) : paramcount(paramcount), prior(prior), method(method) {
+GradDescent::GradDescent( int paramcount, std::vector<MatrixManip::Prior> prior, Method method )
+  : paramcount(paramcount), prior(prior), method(method) {
 }
 void GradDescent::setStartingPosition( M1 x0 ) {
     x = MatrixManip::allocMatrix(paramcount);
@@ -156,9 +158,6 @@ M1 GradDescent::getPos() {
 void GradDescent::setVerbose( bool value ) {
     verbose = value;
 }
-
-
-
 void GradDescent::calcHessian() {
     hess = MatrixManip::allocMatrix( paramcount, paramcount );
     M1 xpp = MatrixManip::allocMatrix( paramcount );
@@ -220,8 +219,6 @@ M2 GradDescent::getRegularisedHessian() {
     MatrixManip::mattranspose(cholhess, cholhessT);
     M2 reghess = MatrixManip::allocMatrix(paramcount,paramcount);
     MatrixManip::matmult(cholhess, cholhessT, reghess);
-    MatrixManip::deallocMatrix(cholhess);
-    MatrixManip::deallocMatrix(cholhessT);
     return reghess;
 }
 M2 GradDescent::getInverseHessian() {

@@ -25,7 +25,7 @@ public:
         M1 position;
         M1 velocity;
         datatype cost;
-        int* neighbour = nullptr;
+        std::vector<int> neighbour;
         struct {
             M1 position;
             M1 velocity;
@@ -34,9 +34,9 @@ public:
     };
     
     int paramcount;
-    particleStruct* particle = nullptr;
+    std::vector<particleStruct> particle;
     particleStruct globalbest, localbest;
-    Prior* prior;
+    std::vector<Prior> prior;
     
     int particlecount;
     int neighbours = 5;
@@ -45,11 +45,11 @@ public:
     int bestcount = 0;
     datatype bestcost = INFINITY, lastbestcost = INFINITY, globalbestcost = INFINITY;
     
-    ParticleSwarmOptimiser( int paramcount, Prior* prior );
+    ParticleSwarmOptimiser( int paramcount, std::vector<Prior> prior );
     ~ParticleSwarmOptimiser();
     void initialise();
     void run();                  // Returns vectors of optimised parameter values
-    virtual datatype costFunction( M1 state, Prior* prior, int n ) { return 0; };
+    virtual datatype costFunction( M1 state, std::vector<Prior> prior, int n ) { return 0; };
     datatype getBestCost();
     M1 getBestPos();
 };

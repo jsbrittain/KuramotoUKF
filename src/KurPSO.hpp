@@ -16,8 +16,8 @@ class KurPSO : public ParticleSwarmOptimiser {
 public:
     KuramotoUKF kurf;
     
-    KurPSO( KuramotoUKF* kurf, int paramcount, Prior* prior );
-    datatype costFunction( M1 state, Prior* prior, int n ) override;
+    KurPSO( KuramotoUKF& kurf, int paramcount, std::vector<Prior> prior );
+    datatype costFunction( M1 state, std::vector<Prior> prior, int n ) override;
 };
 
 #endif /* KurPSO_hpp */

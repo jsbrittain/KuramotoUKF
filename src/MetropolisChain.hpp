@@ -16,14 +16,14 @@
 
 class MetropolisChain : public MatrixManip {
 public:
-    Prior* prior = nullptr;
+    std::vector<Prior> prior;
     
     struct MetropolisChainParams {
         M1 state0;
         M2 covarProposal;
         bool tuneProposal = false;
         int tuningiters = 0;
-        Prior* prior;
+        std::vector<Prior> prior;
         int statedim = 0;
         int randseed = 0;
         int burnin = 200;
@@ -47,7 +47,7 @@ public:
     datatype logPcurrent, logPproposal, logPcrit;
     
     MetropolisChain( MetropolisChainParams mcmcparams );
-    MetropolisChain( M1 state0, M2 covarProposal, bool tuneProposal, int tuningiters, Prior* prior, int statedim, int randseed, int burnin, int chainlength, int verbose );
+    MetropolisChain( M1 state0, M2 covarProposal, bool tuneProposal, int tuningiters, std::vector<Prior>& prior, int statedim, int randseed, int burnin, int chainlength, int verbose );
     ~MetropolisChain();
     void initialise();
     void run( );
@@ -60,7 +60,7 @@ public:
     M1 getMAPstate( );
     
     // Log-likelihood function --- needs to be implemented by children
-    virtual datatype negLogLikeliFcn( M1 state, Prior* prior, int n ) { return NAN; };
+    virtual datatype negLogLikeliFcn( M1 state, std::vector<Prior> prior, int n ) { return 0; };
 };
 
 #endif /* MetropolisChain */

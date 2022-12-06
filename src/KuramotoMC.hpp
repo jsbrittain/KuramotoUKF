@@ -15,8 +15,8 @@
 class KuramotoMCChain : public MetropolisChain {
 public:
     KuramotoUKF kuramotoukf;
-    KuramotoMCChain( KuramotoUKF* kurf, MetropolisChainParams kurmcparams );
-    datatype negLogLikeliFcn( M1 state, Prior* prior, int n ) override;
+    KuramotoMCChain( KuramotoUKF& kurf, MetropolisChainParams kurmcparams );
+    datatype negLogLikeliFcn( M1 state, std::vector<Prior> prior, int n ) override;
 };
 
 #endif /* KuramotoMC_hpp */

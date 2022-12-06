@@ -11,6 +11,7 @@
 
 #include <iostream>
 #include <thread>
+#include <memory>
 
 #include "MatrixManip.hpp"
 #include "KuramotoUKF.hpp"
@@ -20,8 +21,26 @@ class KurPSOchains {
 public:
     KurPSOchains();
     ~KurPSOchains();
-    void runThread( KuramotoUKF::ModelParamsSimple modelparams, int paramcount, KurPSO::Prior* prior, int* paramPriorList, int n_priors, std::string loadfile, std::string savedir, datatype** map, datatype** cost, int threadno );
-    M1 run( KuramotoUKF::ModelParamsSimple modelparams, int paramcount, KurPSO::Prior* prior, int* paramPriorList, int n_priors, std::string loadfile, std::string savedir, int threadcount );
+    void runThread(
+        KuramotoUKF::ModelParamsSimple modelparams,
+        int paramcount,
+        std::vector<KurPSO::Prior> prior,
+        std::vector<int> paramPriorList,
+        int n_priors,
+        std::string loadfile,
+        std::string savedir,
+        std::shared_ptr<M1> map,
+        std::shared_ptr<datatype> cost,
+        int threadno );
+    M1 run(
+        KuramotoUKF::ModelParamsSimple modelparams,
+        int paramcount,
+        std::vector<KurPSO::Prior> prior,
+        std::vector<int> paramPriorList,
+        int n_priors,
+        std::string loadfile,
+        std::string savedir,
+        int threadcount );
 };
 
 #endif /* KurPSOchains_hpp */

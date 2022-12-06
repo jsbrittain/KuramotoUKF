@@ -8,9 +8,10 @@
 
 #include "KuramotoMC.hpp"
 
-KuramotoMCChain::KuramotoMCChain( KuramotoUKF* kurf, MetropolisChainParams mcmcparams ) : kuramotoukf(*kurf), MetropolisChain( mcmcparams ) {
+KuramotoMCChain::KuramotoMCChain(KuramotoUKF& kurf, MetropolisChainParams mcmcparams )
+  : kuramotoukf(kurf), MetropolisChain( mcmcparams ) {
     //
 };
-datatype KuramotoMCChain::negLogLikeliFcn( M1 state, Prior* prior, int n ) {
-    return kuramotoukf.negLogLikeliFcn( state, prior, n );
+datatype KuramotoMCChain::negLogLikeliFcn( M1 state, std::vector<Prior> prior, int n ) {
+    return kuramotoukf.negLogLikeliFcn( state, prior );
 }

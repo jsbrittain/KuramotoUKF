@@ -10,6 +10,8 @@
 #define KurMCMC_hpp
 
 #include <thread>
+#include <vector>
+#include <memory>
 
 #include "KuramotoUKF.hpp"
 #include "MetropolisChain.hpp"
@@ -19,8 +21,30 @@ class KurMCMC {
 public:
     KurMCMC();
     ~KurMCMC();
-    void runThread( KuramotoUKF::KurfParams kurfparams, KuramotoUKF::ModelParamsSimple, MetropolisChain::MetropolisChainParams mcmcparams, int paramcount, MatrixManip::Prior* prior, int* paramPriorList, int n_priors, std::string loadfile, std::string savedir, datatype** map, datatype** cost, int threadno );
-    M1 run( KuramotoUKF::KurfParams kurfparams, KuramotoUKF::ModelParamsSimple, MetropolisChain::MetropolisChainParams mcmcparams, int paramcount, MatrixManip::Prior* prior, int* paramPriorList, int n_priors, std::string loadfile, std::string savedir, int threadcount );
+    void runThread(
+        KuramotoUKF::KurfParams kurfparams,
+        KuramotoUKF::ModelParamsSimple modelparams,
+        MetropolisChain::MetropolisChainParams mcmcparams,
+        int paramcount,
+        std::vector<MatrixManip::Prior> prior,
+        std::vector<int> paramPriorList,
+        int n_priors,
+        std::string loadfile,
+        std::string savedir,
+        std::shared_ptr<M1> map,
+        std::shared_ptr<datatype> cost,
+        int threadno );
+    M1 run(
+        KuramotoUKF::KurfParams kurfparams,
+        KuramotoUKF::ModelParamsSimple modelparams,
+        MetropolisChain::MetropolisChainParams mcmcparams,
+        int paramcount,
+        std::vector<MatrixManip::Prior> prior,
+        std::vector<int> paramPriorList,
+        int n_priors,
+        std::string loadfile,
+        std::string savedir,
+        int threadcount );
 };
 
 #endif /* KurMCMC_hpp */

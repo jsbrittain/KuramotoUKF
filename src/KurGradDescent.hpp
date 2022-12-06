@@ -16,12 +16,12 @@
 
 class KurGradDescent : public GradDescent {
 public:
-    KuramotoUKF* kurf;
+    KuramotoUKF kurf;
     
-    KurGradDescent( KuramotoUKF* kurf, int paramcount, MatrixManip::Prior* prior );
-    KurGradDescent( KuramotoUKF* kurf, int paramcount, MatrixManip::Prior* prior, Method method );
+    KurGradDescent( KuramotoUKF& kurf, int paramcount, std::vector<MatrixManip::Prior> prior );
+    KurGradDescent( KuramotoUKF& kurf, int paramcount, std::vector<MatrixManip::Prior> prior, Method method );
     ~KurGradDescent();
-    datatype costFunction( M1 state, MatrixManip::Prior* prior, int n ) override;
+    datatype costFunction( M1 state, std::vector<MatrixManip::Prior> prior, int n ) override;
 };
 
 #endif /* KurGradDescent_hpp */

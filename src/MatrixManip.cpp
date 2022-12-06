@@ -17,13 +17,10 @@ MatrixManip::~MatrixManip() {
 void MatrixManip::cholesky(M2 A, M2& L) {
     // (L)(L)^T = A
     // A = input matrix, n = (n x n) dimensionality, L = output matrix
-    int n = A.size();
-    int i,j,k;
-    datatype s;
-    for (i = 0; i < n; i++) {
-        for (j = 0; j < (i+1); j++) {
-            s = 0.0;
-            for (k = 0; k < j; k++)
+    for (size_t i = 0; i < A.size(); i++) {
+        for (size_t j = 0; j < (i+1); j++) {
+            datatype s = 0.0;
+            for (size_t k = 0; k < j; k++)
                 s += L[i][k] * L[j][k];
             L[i][j] = (i == j) ? sqrt(A[i][i] - s) : (1.0 / L[j][j] * (A[i][j] - s));
         }
@@ -33,9 +30,9 @@ M2 MatrixManip::mateye( int n ) {
     return mateye( n, static_cast<datatype>(1.0) );
 }
 M2 MatrixManip::mateye( int n, datatype value ) {
-    M2 I = allocMatrix( n, n );
-    for ( int i = 0; i<n; i++ ) {
-        for ( int j = 0; j<n; j++) {
+    M2 I = allocMatrix(n, n);
+    for (int i = 0; i<n; i++) {
+        for (int j = 0; j<n; j++) {
             if ( i == j )
                 I[i][j] = value;
             else
@@ -45,48 +42,36 @@ M2 MatrixManip::mateye( int n, datatype value ) {
     return I;
 }
 void MatrixManip::mattranspose(M2 A, M2 D) {
-    int n1 = A.size();
-    int n2 = A[0].size();
     // Matrix transpose
-    for ( int i = 0; i < n1; i++ ) {
-        for ( int j = 0; j < n2; j++ ) {
+    for (size_t i = 0; i < A.size(); i++) {
+        for (size_t j = 0; j < A[i].size(); j++) {
             D[j][i] = A[i][j];
         }
     }
 }
 void MatrixManip::matmult(M2 A, M1 B, M1 D ) {
-    int na1 = A.size();
-    int na2 = A[0].size();
     // Matrix multipication --- slowest possible method!
-    for ( int i = 0; i < na1; i++) {
+    for (size_t i = 0; i < A.size(); i++) {
         D[i] = 0;
-        for ( int k = 0; k < na2; k++) {
+        for (size_t k = 0; k < A[i].size(); k++) {
             D[i] += A[i][k]*B[k];
         }
     }
 }
 void MatrixManip::matmult( M2 A, M2 B, M2 D ) {
     // Matrix multipication --- slowest possible method!
-    int na1 = A.size(), na2 = A[0].size();
-    int nb1 = D.size(), nb2 = D[0].size();
-    for ( int i = 0; i < na1; i++) {
-        for ( int j = 0; j < nb2; j++) {
+    for (size_t i = 0; i < A.size(); i++) {
+        for (size_t j = 0; j < B[0].size(); j++) {
             D[i][j] = 0.0;
-            for ( int k = 0; k < na2; k++) {
-                // D[i,j] += A[i,k]*B[k,j];
-                //std::cout << i << " " << j << " " << k << " " << A[i*na2+k] << " " << B[k*nb2+j] << " " << A[i*na2+k]*B[k*nb2+j] << std::endl;
+            for (size_t k = 0; k < A[i].size(); k++) {
                 D[i][j] += A[i][k]*B[k][j];
             }
-            //std::cout << D[i*nb2+j] << std::endl;
         }
     }
 }
-void MatrixManip::matmultbyscalar(M2 A, datatype scale, M2& D)
-{
-    int dim1 = A.size(), dim2 = A[0].size();
-    int i,j;
-    for ( i = 0; i < dim1; i++ ) {
-        for ( j = 0; j < dim2; j++ )
+void MatrixManip::matmultbyscalar(M2 A, datatype scale, M2& D) {
+    for (size_t i = 0; i<A.size(); i++) {
+        for (size_t j = 0; j<A[i].size(); j++)
             D[i][j] = scale*A[i][j];
     }
 }
@@ -130,55 +115,45 @@ void MatrixManip::matinvPD( M2 A, M2 D ) {
 }
 void MatrixManip::matinvDiag( M2 A, M2 D ) {
     // Inverse of diagonal matrix
-    int n = A.size();
-    for ( int i = 0; i < n; i++ ) {
-        for ( int j = 0; j < n; j++ )
+    size_t n = A.size();
+    for (size_t i = 0; i < n; i++) {
+        for (size_t j = 0; j < n; j++)
             D[i][j] = 0.0;
     }
-    for ( int k = 0; k < n; k++ )
+    for (size_t k = 0; k < n; k++)
         D[k][k] = 1.0/A[k][k];
 }
 void MatrixManip::matinvL( M2 L, M2 D ) {
     // Inverse of lower-diagonal matrix
-    int n = L.size();
-    int i,j,k;
-    
-    for ( i = 0; i < n; i++ ) {
+    size_t n = L.size();
+    for (size_t i = 0; i < n; i++) {
         D[i][i] = 1.0/L[i][i];
-        for ( j = (i+1); j < n; j++ ) {
-            for ( k = i; k < j; k++ )
+        for (size_t j = (i+1); j < n; j++) {
+            for (size_t k = i; k < j; k++)
                 D[j][i] -= L[j][k]*D[k][i];
             D[j][i] /= L[j][j];
         }
     }
 }
 void MatrixManip::matadd( M2 A, M2 B, M2& D ) {
-    // D = A - B
-    int dim1 = A.size(), dim2 = A[0].size();
-    for ( int i = 0; i < dim1; i++ ) {
-        for ( int j = 0; j < dim2; j++ )
+    // D = A + B
+    for (size_t i = 0; i < A.size(); i++) {
+        for (size_t j = 0; j < A[i].size(); j++)
             D[i][j] = A[i][j] + B[i][j];
     }
 }
  void MatrixManip::matsub( M2 A, M2 B, M2& D ) {
     // D = A - B
-    int dim1 = A.size(), dim2 = A[0].size();
-    for ( int i = 0; i < dim1; i++ ) {
-        for ( int j = 0; j < dim2; j++ )
+    for (size_t i = 0; i < A.size(); i++) {
+        for (size_t j = 0; j < A[i].size(); j++)
             D[i][j] = A[i][j] - B[i][j];
     }
 }
 void MatrixManip::printVector( M1 x ) {
-    int n=x.size();
-    for ( int k = 0; k<n; k++ )
-        std::cout << std::fixed << "    " << k << ": " << x[k] << std::endl;
-}
-void MatrixManip::printVector( int* x, int n ) {
-    for ( int k = 0; k<n; k++ )
+    for (size_t k=0; k<x.size(); k++)
         std::cout << std::fixed << "    " << k << ": " << x[k] << std::endl;
 }
 void MatrixManip::printMatrix( M1 X ) {
-    int n = X.size();
     if ( X.size() == 0 ) {
         std::cout << "nullptr vector reference!" << std::endl;
         return;
@@ -186,35 +161,32 @@ void MatrixManip::printMatrix( M1 X ) {
     printVector( X );
 }
  void MatrixManip::printMatrix( M2 X ) {
-    int n1=X.size(), n2=X[0].size();
-    for ( int i = 0; i < n1; i++ ) {
-        std::cout  << "    [ ";
-        for ( int j = 0; j < n2; j++)
+    for (size_t i=0; i<X.size(); i++) {
+        std::cout << "    [ ";
+        for (size_t j=0; j<X[i].size(); j++)
             std::cout << " " << X[i][j] << " ";
         std::cout << " ]" << std::endl;
     }
 }
 void MatrixManip::outerproduct( M1 x, M2& D ) {
-    int n = x.size();
-    for ( int i = 0; i<n; i++) {
-        for ( int j = 0; j<n; j++ ) {
+    for (size_t i=0; i<x.size(); i++) {
+        for (size_t j=0; j<x.size(); j++) {
             D[i][j] = x[i]*x[j];
         }
     }
 }
 void MatrixManip::outerproduct( M2 x, M2& D ) {
-    int n1 = x.size(), n2 = x[0].size();
-    assert( n2 == 1 );
-    for ( int i = 0; i<n1; i++) {
-        for ( int j = 0; j<n1; j++ ) {
+    size_t n = x.size();
+    assert( x[0].size() == 1 );
+    for(size_t i=0; i<n; i++) {
+        for(size_t j=0; j<n; j++) {
             D[i][j] = x[i][0]*x[j][0];
         }
     }
 }
  void MatrixManip::outerproduct( M1 x, M1 y, M2& D ) {
-    int nx = x.size(), ny = y.size();
-    for ( int i = 0; i<nx; i++) {
-        for ( int j = 0; j<ny; j++ ) {
+    for (size_t i=0; i<x.size(); i++) {
+        for (size_t j=0; j<y.size(); j++) {
             D[i][j] = x[i]*y[j];
         }
     }
@@ -235,12 +207,6 @@ M3 MatrixManip::allocMatrix( int dim1, int dim2, int dim3 ) {
     // Allocate and initialise 2D matrix
     M3 M(dim1,M2(dim2,M1(dim3,0)));
     return M;
-}
-void MatrixManip::deallocMatrix( M1 M ) {
-}
-void MatrixManip::deallocMatrix( M2 M ) {
-}
-void MatrixManip::deallocMatrix( M3 M ) {
 }
 void MatrixManip::uniformrand( int dim1, int dim2, M2& u ) {
     for ( int i = 0; i < dim1; i++ ) {
@@ -287,9 +253,7 @@ datatype MatrixManip::randn( datatype mu, datatype sd ) {
     M1 Mmu(1);
     Mmu[0] = mu;
     mvnrand( Mmu, 1, Sigma, x );
-    deallocMatrix(Sigma);
     datatype y = x[0];
-    //delete[] x;
     return y;
 }
 datatype MatrixManip::randUniform( ) {
@@ -349,7 +313,7 @@ datatype MatrixManip::logLikeliMVNpersistent( M1 x, int n, M1 mu, M2 Sigma ) {
         persistentLogLikeliMVNdim = n;
     }
     
-    for ( int k = 0; k < n; k++ ) {
+    for(int k = 0; k < n; k++) {
         persistentLogLikeliMVNe[k][0] = x[k] - mu[k];
         persistentLogLikeliMVNeT[0][k] = persistentLogLikeliMVNe[k][0];
     }
@@ -405,14 +369,16 @@ datatype MatrixManip::normLikeli( datatype x, datatype mu, datatype sd ) {
         return -0.5*( log(sigma) + (x-mu)*(x-mu)/sigma + log(twopi) );
     }
 }
-datatype MatrixManip::logLikeliPriors( M1 state, Prior* prior, int n ) {
+datatype MatrixManip::logLikeliPriors( M1 state, std::vector<Prior> prior ) {
     datatype logLikeli = 0.0;
-    for ( int k = 0; k < n; k++ )
+    int n = prior.size();
+    for (size_t k = 0; k<prior.size(); k++)
         logLikeli += normLikeli( state[k], prior[k].mu, prior[k].sd );
     return logLikeli;
 }
-void MatrixManip::printPriors( Prior* prior, int n ) {
+void MatrixManip::printPriors( std::vector<Prior> prior ) {
     std::cout << "Prior structure:" << std::endl;
+    int n = prior.size();
     for( int k = 0; k < n; k++) {
         std::cout << k << ": ( " << prior[k].mu << ", " << prior[k].sd << " ) [";
         switch ( prior[k].varclass ) {
@@ -431,7 +397,8 @@ void MatrixManip::printPriors( Prior* prior, int n ) {
         std::cout << "]" << std::endl;
     }
 }
-datatype MatrixManip::matrms( M1 x, int n ) {
+datatype MatrixManip::matrms( M1 x ) {
+    int n = x.size();
     datatype rms = 0;
     for ( int k = 0; k < n; k++ )
         rms += x[k]*x[k];

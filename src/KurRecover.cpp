@@ -17,12 +17,12 @@ void KurRecover::generateData( KuramotoUKF::ModelParamsSimple modelparams, std::
     
     // Form priors from simplified parameters structure
     kuramoto.formPriors( modelparams );
-    KuramotoUKF::Prior *prior = kuramoto.getPriors();
-    int* paramPriorList = kuramoto.getParamPriorList();
+    std::vector<KuramotoUKF::Prior> prior = kuramoto.getPriors();
+    std::vector<int> paramPriorList = kuramoto.getParamPriorList();
     
     // Get (and print) initial states for generating data
-    int n_priors;
-    M1 priorvec = kuramoto.priorsToPriorVec( prior, &n_priors );
+    M1 priorvec = kuramoto.priorsToPriorVec( prior );
+    int n_priors = priorvec.size();
     cout << "Number of priors: " << n_priors << endl;
     
     // Select parameters randomly from prior distributions
@@ -37,7 +37,7 @@ void KurRecover::generateData( KuramotoUKF::ModelParamsSimple modelparams, std::
     cout << "Initialise" << endl;
     kuramoto.initialise(modelparams.n_obs,6000);
     M1 paramvec = kuramoto.priorVecToParamVec( priorvec, paramPriorList );
-    KuramotoUKF::stateConditions* statecond = kuramoto.unpackParamVec(paramvec);
+    KuramotoUKF::stateConditions statecond = kuramoto.unpackParamVec(paramvec);
     
     kuramoto.setInitialConditions( statecond );
     kuramoto.generate(6000);
@@ -55,7 +55,7 @@ void KurRecover::generateData( KuramotoUKF::ModelParamsSimple modelparams, std::
     kuramoto.saveObsPred(     savedir + "/out_ypred.txt"   );*/
     
     cout << " Neg log likeli (without priors): " << kuramoto.negLogLikeliFcn(priorvec) << endl;
-    cout << " Neg log likeli (with priors):    " << kuramoto.negLogLikeliFcn(priorvec, prior, n_priors) << endl;
+    cout << " Neg log likeli (with priors):    " << kuramoto.negLogLikeliFcn(priorvec, prior) << endl;
     MatrixManip::printVector(priorvec);
 }
 
@@ -75,12 +75,12 @@ void KurRecover::parameterRecovery( KuramotoUKF::ModelParamsSimple modelparams, 
     kuramoto.formPriors(modelparams);
     kuramoto.initialise();
     //kuramoto.setInitialConditionsFromPriors();
-    KuramotoUKF::Prior *prior = kuramoto.getPriors();
-    int* paramPriorList = kuramoto.getParamPriorList();
-    int n_priors;
-    M1 priorvec = kuramoto.priorsToPriorVec( prior, &n_priors );
+    std::vector<KuramotoUKF::Prior> prior = kuramoto.getPriors();
+    std::vector<int> paramPriorList = kuramoto.getParamPriorList();
+    M1 priorvec = kuramoto.priorsToPriorVec( prior );
+    int n_priors = priorvec.size();
     M1 paramvec = kuramoto.priorVecToParamVec( priorvec, paramPriorList );
-    KuramotoUKF::stateConditions* statecond = kuramoto.unpackParamVec(paramvec);
+    KuramotoUKF::stateConditions statecond = kuramoto.unpackParamVec(paramvec);
     // Check if initial state file is specified
     if ( options.initstatefile.compare("") != 0 ) {
         if ( options.verbose )
@@ -89,11 +89,11 @@ void KurRecover::parameterRecovery( KuramotoUKF::ModelParamsSimple modelparams, 
         MatrixManip::printMatrix(stateMAP);
         if ( options.verbose ) {
             std::cout << "Initialised KuramotoUKF gives neg-log-likeli (without priors): " << kuramoto.negLogLikeliFcn(stateMAP) << std::endl;
-            std::cout << "Initialised KuramotoUKF gives neg-log-likeli (with priors): " << kuramoto.negLogLikeliFcn(stateMAP, prior, n_priors) << std::endl;
+            std::cout << "Initialised KuramotoUKF gives neg-log-likeli (with priors): " << kuramoto.negLogLikeliFcn(stateMAP, prior) << std::endl;
         }
     } else
         if ( options.verbose )
-            std::cout << "Initialised KuramotoUKF gives neg-log-likeli (with priors): " << kuramoto.negLogLikeliFcn(priorvec, prior, n_priors) << std::endl;
+            std::cout << "Initialised KuramotoUKF gives neg-log-likeli (with priors): " << kuramoto.negLogLikeliFcn(priorvec, prior) << std::endl;
     kuramoto.setInitialConditions( statecond );
     
     /// Particle Swarm Optimisation
@@ -110,7 +110,7 @@ void KurRecover::parameterRecovery( KuramotoUKF::ModelParamsSimple modelparams, 
     
     // Gradient descent
     
-    KurGradDescent kurgraddescent( &kuramoto, n_priors, prior, options.grad_method );
+    KurGradDescent kurgraddescent( kuramoto, n_priors, prior, options.grad_method );
     if ( stateMAP.size() > 0 )
         kurgraddescent.setStartingPosition( stateMAP );
     else {
@@ -168,7 +168,6 @@ void KurRecover::parameterRecovery( KuramotoUKF::ModelParamsSimple modelparams, 
     
     // Load proposal distribution from file (if specified)
     if ( options.mcmc.proposalfile.compare("") != 0 ) {
-        MatrixManip::deallocMatrix(covarProposal);
         covarProposal = loadproposal( options.mcmc.proposalfile, n_priors );
         for ( int k = 0; k < n_priors; k++ ) {
             //covarProposal[k][k] /= 10;
@@ -200,7 +199,7 @@ void KurRecover::parameterRecovery( KuramotoUKF::ModelParamsSimple modelparams, 
     }
     
     // Run simulation on MAP estimate for final state-vectors
-    datatype negloglikeli = kuramoto.negLogLikeliFcn( stateMAP, prior, n_priors );
+    datatype negloglikeli = kuramoto.negLogLikeliFcn( stateMAP, prior );
     if ( options.verbose ) std::cout << "Writing estimated states to file for log-neg-likeli = " << negloglikeli << std::endl;
     saveParams( options.savedir + "/out_params.txt", stateMAP, n_priors );
     kuramoto.saveStates(      options.savedir + "/out_x.txt"      );
@@ -208,11 +207,6 @@ void KurRecover::parameterRecovery( KuramotoUKF::ModelParamsSimple modelparams, 
     kuramoto.saveObs(         options.savedir + "/out_y.txt"      );
     kuramoto.saveObsPred(     options.savedir + "/out_ypred.txt"  );
     kuramoto.saveObsCovar(    options.savedir + "/out_ySigma.txt" );
-    
-    // Clean-up
-    delete[] paramPriorList;
-    //delete[] priorvec;
-    //delete[] paramvec;
 }
 
 void KurRecover::saveParams( std::string filename, M1 x, int n ) {

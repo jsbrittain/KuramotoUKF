@@ -8,21 +8,21 @@
 
 #include "KuramotoUKF.hpp"
 
-KuramotoUKF::KuramotoUKF( int nodecount, int n_statevars, datatype alpha, datatype beta, datatype kappa, datatype dt ) : nodecount(nodecount), dt(dt) {
+KuramotoUKF::KuramotoUKF( int nodecount, int n_statevars, datatype alpha, datatype beta, datatype kappa, datatype dt )
+  : nodecount(nodecount), dt(dt) {
     calpha = alpha;
     cbeta = beta;
     ckappa = kappa;
     UnscentedKalmanFilter::n_statevars = n_statevars;
 }
-KuramotoUKF::KuramotoUKF( KurfParams kurfparams ) : nodecount(kurfparams.nodecount), dt(kurfparams.dt) {
+KuramotoUKF::KuramotoUKF( KurfParams kurfparams )
+  : nodecount(kurfparams.nodecount), dt(kurfparams.dt) {
     calpha = kurfparams.alpha;
     cbeta = kurfparams.beta;
     ckappa = kurfparams.kappa;
     UnscentedKalmanFilter::n_statevars = kurfparams.n_statevars;
 }
 KuramotoUKF::~KuramotoUKF() {
-    //deallocMatrix(y,N,n_obs);
-    //deallocMatrix(yGivenX,n_obs);
 }
 void KuramotoUKF::initialise( int n_obs, int samplecount ) {
     UnscentedKalmanFilter::n_obs = n_obs;
@@ -167,14 +167,20 @@ void KuramotoUKF::printK( ) {
     printMatrix(K);
 }
 void KuramotoUKF::setInitialConditionsFromPriors() {
-    int n_priors;
-    M1 priorvec = priorsToPriorVec( prior, &n_priors );
+    M1 priorvec = priorsToPriorVec( prior );
     M1 paramvec = priorVecToParamVec( priorvec, paramPriorList );
-    stateConditions* statecond = unpackParamVec(paramvec);
+    stateConditions statecond = unpackParamVec(paramvec);
     KuramotoUKF::setInitialConditions( statecond );
 }
-void KuramotoUKF::setInitialConditions( stateConditions* statecond ) {
-    KuramotoUKF::setInitialConditions( statecond->x, statecond->P, statecond->stateNoise, statecond->obsNoise, statecond->ascaling, statecond->feedbackStrength, statecond->feedbacklag_secs );
+void KuramotoUKF::setInitialConditions( stateConditions statecond ) {
+    KuramotoUKF::setInitialConditions(
+        statecond.x,
+        statecond.P,
+        statecond.stateNoise,
+        statecond.obsNoise,
+        statecond.ascaling,
+        statecond.feedbackStrength,
+        statecond.feedbacklag_secs );
 }
 void KuramotoUKF::setInitialConditions( M1 x0, M2 P0, M2 stateNoise, M2 obsNoise, datatype ascaling, datatype feedbackStrength, datatype feedbacklag_secs ) {
     
@@ -197,7 +203,7 @@ void KuramotoUKF::setInitialConditions( M1 x0, M2 P0, M2 stateNoise, M2 obsNoise
     UnscentedKalmanFilter::matmultbyscalar( stateNoise,  sqrtdt, UnscentedKalmanFilter::stateNoise );
     UnscentedKalmanFilter::matmultbyscalar( obsNoise, sqrtdt*(KuramotoUKF::ascaling*KuramotoUKF::ascaling), UnscentedKalmanFilter::obsNoise );
 }
-void KuramotoUKF::applymask( M2 X, int dim1, int dim2, int** mask ) {
+void KuramotoUKF::applymask( M2 X, int dim1, int dim2, std::vector<std::vector<int>> mask ) {
     for ( int i = 0; i < dim1; i++ ) {
         for ( int j = 0; j < dim2; j++ ) {
             if ( mask[i][j] == 0 )
@@ -254,12 +260,12 @@ void KuramotoUKF::testTrigonometricApproximations( const string filename ) {
     }
     writeMatrixToFile(filename, x, K, 3);
 }
-datatype KuramotoUKF::negLogLikeliFcn( M1 x, Prior* prior, int n ) {
-    return negLogLikeliFcn( x ) - logLikeliPriors( x, prior, n );
+datatype KuramotoUKF::negLogLikeliFcn( M1 x, std::vector<Prior> prior ) {
+    return negLogLikeliFcn( x ) - logLikeliPriors( x, prior );
 }
 datatype KuramotoUKF::negLogLikeliFcn( M1 x ) {
     M1 paramvec = priorVecToParamVec(x, paramPriorList);
-    stateConditions* initCond = unpackParamVec(paramvec);
+    stateConditions initCond = unpackParamVec(paramvec);
     
     // Set conditions and return (negative) log-likelihood
     setInitialConditions( initCond );
@@ -278,10 +284,6 @@ void KuramotoUKF::formPriors( KuramotoUKF::ModelParamsSimple params ) {
        This ordering requires multiple definitions to account for parameter or variable definitions
      */
     
-    // Clean-out old priors first
-    if ( prior != nullptr ) delete[] prior;
-    if ( paramPriorList != nullptr ) delete[] paramPriorList;
-    
     // Determine some parameters and set in class
     nodecount = params.nodecount;
     n_statevars = 2*nodecount +
@@ -298,16 +300,14 @@ void KuramotoUKF::formPriors( KuramotoUKF::ModelParamsSimple params ) {
     crossPmask = initCovarMask( n_statevars, n_obs, Masktype::full );
     
     // Form new priors lists
-    paramPriorList = new int[n_params];
-    prior = new MatrixManip::Prior[n_params];
-    int* blockindices = nullptr;
-    
-    
+    paramPriorList = std::vector<int>(n_params);
+    prior = std::vector<Prior>(n_params);
+    std::vector<int> blockindices;
     
     // Starting phase and inst freqs
     int k;
-    paramindex.phase0 = new int[nodecount];
-    blockindices = new int[nodecount];
+    paramindex.phase0 = std::vector<int>(nodecount);
+    blockindices = std::vector<int>(nodecount);
     for ( k = 0; k < nodecount; k++ ) {
         // Initial phase values (linear; fixed in state transition)
         prior[k].mu = 2.0*pi*k/nodecount; prior[k].sd = pi;
@@ -324,7 +324,7 @@ void KuramotoUKF::formPriors( KuramotoUKF::ModelParamsSimple params ) {
     prior[k].mu = params.omega.value;
     prior[k].sd = prior[k].mu/10;
     prior[k].varclass = MatrixManip::Prior::VarClass::linear;
-    paramindex.instfreq = new int[nodecount];
+    paramindex.instfreq = std::vector<int>(nodecount);
     for ( int i = 0; i < nodecount; i++ ) {
         //updateCovarMasks_StateVar( j, params.omega.covarMask );
         blockindices[i] = nodecount + i;
@@ -333,7 +333,6 @@ void KuramotoUKF::formPriors( KuramotoUKF::ModelParamsSimple params ) {
         j++;
     }
     updateCovarMasks_StateVar( nodecount, params.omega.covarMask, blockindices, nodecount );
-    delete[] blockindices;
     k++;
     
     // Coupling strength K (log-linear; fixed in state transition)
@@ -363,7 +362,7 @@ void KuramotoUKF::formPriors( KuramotoUKF::ModelParamsSimple params ) {
     // Initial phase (variance)
     prior[k].mu = params.theta.P0; prior[k].sd = prior[k].mu;
     prior[k].varclass = MatrixManip::Prior::VarClass::variance;
-    paramindex.phase0Sigma = new int[nodecount];
+    paramindex.phase0Sigma = std::vector<int>(nodecount);
     for ( int i = 0; i < nodecount; i++ ) {
         //updateCovarMasks_StateVar( j, params.theta.covarMask );
         paramindex.phase0Sigma[i] = j;
@@ -374,7 +373,7 @@ void KuramotoUKF::formPriors( KuramotoUKF::ModelParamsSimple params ) {
     // Inst freq (variance)
     prior[k].mu = params.omega.P0; prior[k].sd = prior[k].mu;
     prior[k].varclass = MatrixManip::Prior::VarClass::variance;
-    paramindex.instfreq0Sigma = new int[nodecount];
+    paramindex.instfreq0Sigma = std::vector<int>(nodecount);
     for ( int i = 0; i < nodecount; i++ ) {
         //updateCovarMasks_StateVar( j, params.omega.covarMask );
         paramindex.instfreq0Sigma[i] = j;
@@ -406,7 +405,7 @@ void KuramotoUKF::formPriors( KuramotoUKF::ModelParamsSimple params ) {
     // Phase (variance)
     prior[k].mu = params.theta.P; prior[k].sd = prior[k].mu/10;
     prior[k].varclass = MatrixManip::Prior::VarClass::variance;
-    paramindex.phaseSigma = new int[nodecount];
+    paramindex.phaseSigma = std::vector<int>(nodecount);
     for ( int i = 0; i < nodecount; i++ ) {
         //updateCovarMasks_StateVar( j, params.theta.covarMask );
         paramindex.phaseSigma[i] = j;
@@ -417,7 +416,7 @@ void KuramotoUKF::formPriors( KuramotoUKF::ModelParamsSimple params ) {
     // Inst freq (variance)
     prior[k].mu = params.omega.P; prior[k].sd = prior[k].mu/10;
     prior[k].varclass = MatrixManip::Prior::VarClass::variance;
-    paramindex.instfreqSigma = new int[nodecount];
+    paramindex.instfreqSigma = std::vector<int>(nodecount);
     for ( int i = 0; i < nodecount; i++ ) {
         //updateCovarMasks_StateVar( j, params.omega.covarMask );
         paramindex.instfreqSigma[i] = j;
@@ -527,14 +526,9 @@ void KuramotoUKF::formPriors( KuramotoUKF::ModelParamsSimple params ) {
         }
     }
 }
-bool** KuramotoUKF::initCovarMask( int dim1, int dim2, Masktype masktype ) {
+std::vector<std::vector<bool>> KuramotoUKF::initCovarMask( int dim1, int dim2, Masktype masktype ) {
     // Initialise state covar mask
-    bool** mask = new bool*[dim1];
-    for(int i=0; i<dim1; i++) {
-        mask[i] = new bool[dim2];
-        for(int j=0; j<dim2; j++)
-            mask[i][j] = false;
-    }
+    std::vector<std::vector<bool>> mask(dim1,std::vector<bool>(dim2,false));
     // Select mask type and populate matrix
     switch ( masktype ) {
         case Masktype::zero:
@@ -566,9 +560,10 @@ bool** KuramotoUKF::initCovarMask( int dim1, int dim2, Masktype masktype ) {
     return mask;
 }
 void KuramotoUKF::updateCovarMasks_StateVar( int k, Masktype masktype ) {
-    updateCovarMasks_StateVar( k, masktype, nullptr, 0 );
+    std::vector<int> blockindices(0);
+    updateCovarMasks_StateVar( k, masktype, blockindices, 0 );
 }
-void KuramotoUKF::updateCovarMasks_StateVar( int k, Masktype masktype, int* blockindices, int blockcount ) {
+void KuramotoUKF::updateCovarMasks_StateVar( int k, Masktype masktype, std::vector<int> blockindices, int blockcount ) {
     switch ( masktype ) {
         case Masktype::defaultmask:
             break;
@@ -610,7 +605,7 @@ void KuramotoUKF::updateCovarMasks_StateVar( int k, Masktype masktype, int* bloc
             assert( "KuramotoUKF::updateCovarMask: Requested covariance mask-type not recognised." );
     }
 }
-bool KuramotoUKF::isMaskFull( bool** mask, int dim1, int dim2 ) {
+bool KuramotoUKF::isMaskFull( std::vector<std::vector<bool>> mask, int dim1, int dim2 ) {
     // Is covariance mask ::full ?
     for ( int i = 0; i < dim1; i++ ) {
         for ( int j = 0; j < dim2; j++ )
@@ -620,76 +615,76 @@ bool KuramotoUKF::isMaskFull( bool** mask, int dim1, int dim2 ) {
     }
     return true;
 }
-void KuramotoUKF::setPriors( int* paramPriorList, int n_priors, int n_params ) {
+void KuramotoUKF::setPriors( std::vector<int> paramPriorList, int n_priors, int n_params ) {
     // Not necessary for UKF operation, but is necessary for prior based optimisation
     KuramotoUKF::paramPriorList = paramPriorList;
     KuramotoUKF::n_priors = n_priors;
     KuramotoUKF::n_params = n_params;
 }
-KuramotoUKF::Prior* KuramotoUKF::getPriors() {
+std::vector<KuramotoUKF::Prior> KuramotoUKF::getPriors() {
     return prior;
 }
-int* KuramotoUKF::getParamPriorList( ) {
+std::vector<int> KuramotoUKF::getParamPriorList( ) {
     return paramPriorList;
 }
-void KuramotoUKF::printStateCond( stateConditions* statecond ) {
+void KuramotoUKF::printStateCond( stateConditions statecond ) {
     cout << "Initial conditions report:" << endl << "x0:" << endl;
-    printVector(statecond->x);
+    printVector(statecond.x);
     cout << "P0:" << endl;
-    printMatrix(statecond->P);
+    printMatrix(statecond.P);
     cout << "stateNoise:" << endl;
-    printMatrix(statecond->stateNoise);
+    printMatrix(statecond.stateNoise);
     cout << "obsNoise:" << endl;
-    printMatrix(statecond->obsNoise);
+    printMatrix(statecond.obsNoise);
 }
-M1 KuramotoUKF::priorsToPriorVec( Prior* prior, int* n_priors ) {
-    (*n_priors) = KuramotoUKF::n_priors;
-    M1 x(*n_priors);
-    for ( int k = 0; k < *n_priors; k++ )
+M1 KuramotoUKF::priorsToPriorVec( std::vector<Prior> prior ) {
+    int n_priors = KuramotoUKF::n_priors;
+    M1 x(n_priors);
+    for ( int k = 0; k < n_priors; k++ )
         x[k] = prior[k].mu;
     return x;
 }
-KuramotoUKF::stateConditions* KuramotoUKF::unpackParamVec( M1 paramvec ) {
+KuramotoUKF::stateConditions KuramotoUKF::unpackParamVec( M1 paramvec ) {
     
     // Initial state conditions structure
-    stateConditions* statecond = new stateConditions;
-    statecond->x          = MatrixManip::allocMatrix(n_statevars);
-    statecond->P          = MatrixManip::allocMatrix(n_statevars,n_statevars);
-    statecond->stateNoise = MatrixManip::allocMatrix(n_statevars,n_statevars);
-    statecond->obsNoise   = MatrixManip::allocMatrix(n_obs,n_obs);
+    stateConditions statecond;
+    statecond.x          = MatrixManip::allocMatrix(n_statevars);
+    statecond.P          = MatrixManip::allocMatrix(n_statevars,n_statevars);
+    statecond.stateNoise = MatrixManip::allocMatrix(n_statevars,n_statevars);
+    statecond.obsNoise   = MatrixManip::allocMatrix(n_obs,n_obs);
     
     // Initial states for generating data
     for ( int k = 0; k < n_statevars; k++ ) {
-        statecond->x[k] = paramvec[k];
-        statecond->P[k][k] = exp(paramvec[n_statevars+k]);
-        statecond->P[k][k] = statecond->P[k][k]*statecond->P[k][k];
+        statecond.x[k] = paramvec[k];
+        statecond.P[k][k] = exp(paramvec[n_statevars+k]);
+        statecond.P[k][k] = statecond.P[k][k]*statecond.P[k][k];
         if ( !isnan(paramvec[2*n_statevars+k]) ) {
-            statecond->stateNoise[k][k] = exp(paramvec[2*n_statevars+k]);
-            statecond->stateNoise[k][k] = statecond->stateNoise[k][k]*statecond->stateNoise[k][k];
+            statecond.stateNoise[k][k] = exp(paramvec[2*n_statevars+k]);
+            statecond.stateNoise[k][k] = statecond.stateNoise[k][k]*statecond.stateNoise[k][k];
         }
     }
     
     // Observation noise
     for ( int k = 0; k < n_obs; k++ ) {
-        statecond->obsNoise[k][k] = exp(paramvec[paramindex.ySigma]);
-        statecond->obsNoise[k][k] = statecond->obsNoise[k][k]*statecond->obsNoise[k][k];
+        statecond.obsNoise[k][k] = exp(paramvec[paramindex.ySigma]);
+        statecond.obsNoise[k][k] = statecond.obsNoise[k][k]*statecond.obsNoise[k][k];
     }
     
     // Sensory feedback
     if ( paramindex.feedbackStrength != -1 ) {
-        statecond->feedbackStrength = exp(paramvec[paramindex.feedbackStrength]);
-        statecond->feedbacklag_secs = feedbacklag_secs_min + exp(paramvec[paramindex.feedbackLagSecs]);
+        statecond.feedbackStrength = exp(paramvec[paramindex.feedbackStrength]);
+        statecond.feedbacklag_secs = feedbacklag_secs_min + exp(paramvec[paramindex.feedbackLagSecs]);
     } else {
-        statecond->feedbackStrength = 0.0;
-        statecond->feedbacklag_secs = feedbacklag_secs_min;
+        statecond.feedbackStrength = 0.0;
+        statecond.feedbacklag_secs = feedbacklag_secs_min;
     }
     
     // Observation scaling
-    statecond->ascaling = exp(paramvec[paramindex.ascaling]);
+    statecond.ascaling = exp(paramvec[paramindex.ascaling]);
     
     return statecond;
 }
-M1 KuramotoUKF::priorVecToParamVec( M1 priorvec, int* paramPriorList ) {
+M1 KuramotoUKF::priorVecToParamVec( M1 priorvec, std::vector<int> paramPriorList ) {
     M1 paramvec = allocMatrix(n_params);
     for  (int k = 0; k < n_params; k++ )
         paramvec[k] = priorvec[paramPriorList[k]];
