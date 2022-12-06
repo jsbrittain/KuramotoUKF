@@ -26,11 +26,11 @@ static const datatype phase2lookup = TRIGRES/twopi;
 class UnscentedKalmanFilter : public MatrixManip {
 public:
     int n_statevars, n_obs, N, t;	// N = sample count
-    datatype **state = nullptr;		// State variables [t,k]
-    datatype **statepred = nullptr;
-    datatype ***stateP = nullptr;      // State-transition covariance [t,k,k]
-    datatype **ypred = nullptr;		// Calculated (predicted) measurements
-    datatype **y = nullptr;			// Observed data (fixed)
+    M2 state;		// State variables [t,k]
+    M2 statepred;
+    M3 stateP;      // State-transition covariance [t,k,k]
+    M2 ypred;		// Calculated (predicted) measurements
+    M2 y;			// Observed data (fixed)
     datatype costable[TRIGRES], sintable[TRIGRES];
     
     bool** statePmask=nullptr;
@@ -38,42 +38,42 @@ public:
     bool** crossPmask=nullptr;
     
     int n_sigmavecs;
-    datatype **sigmaX = nullptr;		// Sigma vectors [L',k]
-    datatype **sigmaXpred = nullptr;
-    datatype **sigmaXpredMS = nullptr;
-    datatype **sigmasqrtP = nullptr;
-    datatype *sigmaWc = nullptr;
-    datatype *sigmaWm = nullptr;
-    datatype **sigmaY = nullptr;
-    datatype **sigmaYpredMS = nullptr;
-    datatype ***sigmaPcovarX = nullptr;
-    datatype ***sigmaPcovarY = nullptr;
-    datatype ***sigmaPcovarXY = nullptr;
-    datatype ***statePXXpred = nullptr;
-    datatype ***statePXYpred = nullptr;
-    datatype ***statePYYpred = nullptr;
-    datatype **stateNoise = nullptr;
-    datatype **obsNoise = nullptr;
-    datatype **PyyInv = nullptr;
-    datatype *ydiff = nullptr;
-    datatype **K = nullptr;
-    datatype **KT = nullptr;
-    datatype **PyyKT = nullptr;
-    datatype **KPyyKT = nullptr;
-    datatype **L = nullptr;
-    datatype **Linv = nullptr;
-    datatype **LinvT = nullptr;
+    M2 sigmaX;		// Sigma vectors [L',k]
+    M2 sigmaXpred;
+    M2 sigmaXpredMS;
+    M2 sigmasqrtP;
+    M1 sigmaWc;
+    M1 sigmaWm;
+    M2 sigmaY;
+    M2 sigmaYpredMS;
+    M3 sigmaPcovarX;
+    M3 sigmaPcovarY;
+    M3 sigmaPcovarXY;
+    M3 statePXXpred;
+    M3 statePXYpred;
+    M3 statePYYpred;
+    M2 stateNoise;
+    M2 obsNoise;
+    M2 PyyInv;
+    M1 ydiff;
+    M2 K;
+    M2 KT;
+    M2 PyyKT;
+    M2 KPyyKT;
+    M2 L;
+    M2 Linv;
+    M2 LinvT;
     datatype clambda, calpha, cbeta, ckappa;
     datatype sqrtPscaling;
     
     UnscentedKalmanFilter();
     ~UnscentedKalmanFilter();
     void reset();
-    virtual void stateTransitionFunction( datatype* x, datatype* xpred ) {};
-    virtual void observationFunction( datatype* x, datatype* y ) {};
-    void genSigmaX( datatype* x, datatype** P, int dim, datatype** sigmaX );
+    virtual void stateTransitionFunction( M1 x, M1 xpred ) {};
+    virtual void observationFunction( M1 x, M1 y ) {};
+    void genSigmaX( M1 x, M2 P, int dim, M2 sigmaX );
     void genSigmaW( );
-    void sqrtPscaled(datatype** L);
+    void sqrtPscaled(M2 L);
     void predict();
     void update();
     void initialise();

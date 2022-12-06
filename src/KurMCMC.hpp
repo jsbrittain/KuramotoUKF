@@ -20,7 +20,7 @@ public:
     KurMCMC();
     ~KurMCMC();
     void runThread( KuramotoUKF::KurfParams kurfparams, KuramotoUKF::ModelParamsSimple, MetropolisChain::MetropolisChainParams mcmcparams, int paramcount, MatrixManip::Prior* prior, int* paramPriorList, int n_priors, std::string loadfile, std::string savedir, datatype** map, datatype** cost, int threadno );
-    datatype* run( KuramotoUKF::KurfParams kurfparams, KuramotoUKF::ModelParamsSimple, MetropolisChain::MetropolisChainParams mcmcparams, int paramcount, MatrixManip::Prior* prior, int* paramPriorList, int n_priors, std::string loadfile, std::string savedir, int threadcount );
+    M1 run( KuramotoUKF::KurfParams kurfparams, KuramotoUKF::ModelParamsSimple, MetropolisChain::MetropolisChainParams mcmcparams, int paramcount, MatrixManip::Prior* prior, int* paramPriorList, int n_priors, std::string loadfile, std::string savedir, int threadcount );
 };
 
 #endif /* KurMCMC_hpp */

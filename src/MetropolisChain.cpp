@@ -11,14 +11,11 @@
 MetropolisChain::MetropolisChain( MetropolisChainParams mcmcparams) : state0(mcmcparams.state0), statedim(mcmcparams.statedim), covarProposal(mcmcparams.covarProposal), tuneProposal(mcmcparams.tuneProposal), tuningiters(mcmcparams.tuningiters), prior(mcmcparams.prior), randseed(mcmcparams.randseed), burnin(mcmcparams.burnin), chainlength(mcmcparams.chainlength), verbose(mcmcparams.verbose) {
     initialise();
 }
-MetropolisChain::MetropolisChain( datatype* state0, datatype** covarProposal, bool tuneProposal, int tuningiters, Prior* prior, int statedim, int randseed, int burnin, int chainlength, int verbose ) : state0(state0), statedim(statedim), covarProposal(covarProposal), tuneProposal(tuneProposal), tuningiters(tuningiters), prior(prior), randseed(randseed), burnin(burnin), chainlength(chainlength), verbose(verbose) {
+MetropolisChain::MetropolisChain( M1 state0, M2 covarProposal, bool tuneProposal, int tuningiters, Prior* prior, int statedim, int randseed, int burnin, int chainlength, int verbose ) : state0(state0), statedim(statedim), covarProposal(covarProposal), tuneProposal(tuneProposal), tuningiters(tuningiters), prior(prior), randseed(randseed), burnin(burnin), chainlength(chainlength), verbose(verbose) {
     initialise();
 }
 MetropolisChain::~MetropolisChain()
 {
-    deallocMatrix(&stateCurrent,chainlength,statedim);
-    deallocMatrix(&stateNegLogLikeli,chainlength);
-    deallocMatrix(&stateProposal,statedim);
 }
 void MetropolisChain::initialise( ) {
     // Initialise at start of chain
@@ -55,7 +52,7 @@ void MetropolisChain::run() {
     // Approximate covarProposal based on univariate searches
     if ( tuneProposal ) {
         // Keep best solution after burnin
-        datatype* beststate = getMAPstate();
+        M1 beststate = getMAPstate();
         
         // Determine univariate acceptance rates
         datatype desired_acceptance_rate = 0.234;
@@ -67,7 +64,7 @@ void MetropolisChain::run() {
         std::cout << "Target univariate acceptance rate: " << univariate_acceptance_rate << std::endl;
         
         // Backup full covarProposal
-        datatype** covarProposal0 = MatrixManip::allocMatrix(statedim,statedim);
+        M2 covarProposal0 = MatrixManip::allocMatrix(statedim,statedim);
         for ( int i = 0; i < statedim; i++ )
             covarProposal0[i][i] = covarProposal[i][i];
         
@@ -126,7 +123,7 @@ void MetropolisChain::run() {
             stateCurrent[1][k] = beststate[k];
         chaint = 1; chainlength = 2;
         
-        delete[] beststate;
+        //delete[] beststate;
         return;
     }
     
@@ -188,18 +185,16 @@ bool MetropolisChain::step() {
         mvnrand(stateCurrent[chaint-1], statedim, covarProposal, stateProposal);
     else {
         // Only one variables changes at a time when tuning
-        datatype* mu = allocMatrix(1);
-        datatype** prop = allocMatrix(1, 1);
+        M1 mu = allocMatrix(1);
+        M2 prop = allocMatrix(1, 1);
         for ( int k = 0; k < statedim; k++ ) {
             if (covarProposal[k][k] != 0 ) {
                 mu[0] = stateCurrent[chaint-1][k];
                 prop[0][0] = covarProposal[k][k];
-                mvnrand(mu, 1, prop, &stateProposal[k]);
+                mvnrand(mu, 1, prop, stateProposal[k]);
             } else
                 stateProposal[k] = stateCurrent[chaint-1][k];
         }
-        deallocMatrix(&mu, 1);
-        deallocMatrix(&prop, 1, 1);
     }
     
     // Determine proposal likelihood
@@ -221,16 +216,14 @@ bool MetropolisChain::step() {
     stateNegLogLikeli[chaint] = logPcurrent;
     return accepted;
 }
-datatype MetropolisChain::negLogLikeliTestFcn( datatype* state ) {
-    datatype* mu = allocMatrix(statedim);
-    datatype** Sigma = mateye( statedim );
+datatype MetropolisChain::negLogLikeliTestFcn( M1 state ) {
+    M1 mu = allocMatrix(statedim);
+    M2 Sigma = mateye( statedim );
     for ( int i = 0; i < statedim; i++ ) {
-        mu[i] = (datatype) (i - statedim/2);
+        mu[i] = i - static_cast<datatype>(statedim)/2.0;
         Sigma[i][i] = (i+1);
     }
     datatype logLikeli = logLikeliMVN( state, statedim, mu, Sigma );
-    deallocMatrix(&mu, statedim);
-    deallocMatrix(&Sigma, statedim, statedim);
     return -logLikeli;
 }
 void MetropolisChain::saveChain( const std::string filename ) {
@@ -253,7 +246,7 @@ datatype MetropolisChain::getMAPcost( ) {
     }
     return bestcost;
 }
-datatype* MetropolisChain::getMAPstate( ) {
+M1 MetropolisChain::getMAPstate( ) {
     int bestpos = 0;
     datatype bestcost = stateNegLogLikeli[0];
     for ( int k = 1; k < chainlength; k++ ) {
@@ -263,7 +256,7 @@ datatype* MetropolisChain::getMAPstate( ) {
         }
     }
     // Allocate new memory for return
-    datatype* MAPstate = new datatype[statedim];
+    M1 MAPstate;// = new datatype[statedim];
     for ( int k = 0; k < statedim; k++ )
         MAPstate[k] = stateCurrent[bestpos][k];
     return MAPstate;

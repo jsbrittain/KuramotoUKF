@@ -31,7 +31,7 @@ public:
     datatype nodecountf;
     datatype dt, ycos;
     datatype ascaling;
-    datatype* yGivenX = nullptr;
+    M1 yGivenX;
     int* paramPriorList = nullptr;
     Prior* prior = nullptr;
     int n_params, n_priors;
@@ -113,10 +113,10 @@ public:
     };
     
     struct stateConditions {
-        datatype* x;
-        datatype** P;
-        datatype** stateNoise;
-        datatype** obsNoise;
+        M1 x;
+        M2 P;
+        M2 stateNoise;
+        M2 obsNoise;
         datatype feedbackStrength = 0.0;
         datatype feedbacklag_secs = 0.0;
         datatype ascaling = 1.0;
@@ -127,8 +127,8 @@ public:
     ~KuramotoUKF();
     void initialise();
     void initialise( int n_obs, int samplecount );
-    void stateTransitionFunction( datatype* x, datatype* xpred ) override;
-    void observationFunction( datatype* x, datatype* y ) override;
+    void stateTransitionFunction( M1 x, M1 xpred ) override;
+    void observationFunction( M1 x, M1 y ) override;
     datatype cosT( datatype x );
     datatype sinT( datatype x );
     void readMeasurementFile( const string filename, int n_obs );
@@ -136,14 +136,14 @@ public:
     void update() { UnscentedKalmanFilter::update(); }
     void generate( datatype T ) { UnscentedKalmanFilter::generate( (int) T/dt ); };
     void generate( int N ) { UnscentedKalmanFilter::generate( N ); };
-    void applymask( datatype** X, int dim1, int dim2, int** mask );
+    void applymask( M2 X, int dim1, int dim2, int** mask );
     void printState( );
     void printPrediction( );
     void printSigmaX();
     void printK();
     void setInitialConditionsFromPriors( );
     void setInitialConditions( stateConditions* initcond );
-    void setInitialConditions( datatype* x0, datatype** P0, datatype** stateNoise, datatype** obsNoise, datatype ascaling, datatype feedbackStrength, datatype feedbacklag_secs );
+    void setInitialConditions( M1 x0, M2 P0, M2 stateNoise, M2 obsNoise, datatype ascaling, datatype feedbackStrength, datatype feedbacklag_secs );
     void checkCholesky() { UnscentedKalmanFilter::checkCholesky(); }
     void testTranspose( ) ;
     void mathCheck( );
@@ -155,8 +155,8 @@ public:
     void testRandomNumberGenerators( const string filestem ) { UnscentedKalmanFilter::testRandomNumberGenerators( filestem ); };
     int getSampleCount() { return UnscentedKalmanFilter::N; };
     void reset() { UnscentedKalmanFilter::reset(); };
-    datatype negLogLikeliFcn( datatype* x, Prior* prior, int n );
-    datatype negLogLikeliFcn( datatype* x );
+    datatype negLogLikeliFcn( M1 x, Prior* prior, int n );
+    datatype negLogLikeliFcn( M1 x );
     void formPriors( KuramotoUKF::ModelParamsSimple params );
     bool** initCovarMask( int dim1, int dim2, Masktype masktype );
     void updateCovarMasks_StateVar( int k, Masktype masktype );
@@ -166,10 +166,10 @@ public:
     Prior* getPriors( );
     int* getParamPriorList( );
     void printStateCond( stateConditions* initcond );
-    datatype* priorsToPriorVec( Prior* prior, int* n_priors );
-    stateConditions* unpackParamVec( datatype* paramvec );
-    datatype* priorVecToParamVec( datatype* priorvec, int* paramPriorList );
-    datatype* rmsy();
+    M1 priorsToPriorVec( Prior* prior, int* n_priors );
+    stateConditions* unpackParamVec( M1 paramvec );
+    M1 priorVecToParamVec( M1 priorvec, int* paramPriorList );
+    M1 rmsy();
     bool isVariable( ModelVar var );
     bool isParameter( ModelVar var );
 };

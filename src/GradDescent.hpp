@@ -22,11 +22,11 @@ public:
     bool verbose = false;
     int paramcount;
     MatrixManip::Prior* prior = nullptr;
-    datatype* x = nullptr;
+    M1 x;
     datatype cost = 0;
     datatype momentumcoeff = 0.9;
     datatype learningrate = 0.1;
-    datatype** hess;
+    M2 hess;
     datatype sdscaling = 1e-4;
     datatype eps = 1e-6;
     datatype decay_rate = 0.99;
@@ -39,18 +39,18 @@ public:
     
     GradDescent( int paramcount, MatrixManip::Prior* prior );
     GradDescent( int paramcount, MatrixManip::Prior* prior, Method method );
-    virtual datatype costFunction( datatype* state, MatrixManip::Prior* prior, int n ) { return 0; };
-    void setStartingPosition( datatype* x0 );
+    virtual datatype costFunction( M1 state, MatrixManip::Prior* prior, int n ) { return 0; };
+    void setStartingPosition( M1 x0 );
     void usePriorsForStartingPosition( );
     void run();
     datatype getCost();
-    datatype* getPos();
+    M1 getPos();
     void setVerbose( bool value );
     void calcHessian();
-    void saveToFile( datatype** D, std::string filename );
-    datatype** getHessian();
-    datatype** getRegularisedHessian();
-    datatype** getInverseHessian();
+    void saveToFile( M2 D, std::string filename );
+    M2 getHessian();
+    M2 getRegularisedHessian();
+    M2 getInverseHessian();
 };
 
 #endif /* GradDescent_hpp */

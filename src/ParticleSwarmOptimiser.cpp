@@ -12,22 +12,6 @@ ParticleSwarmOptimiser::ParticleSwarmOptimiser( int paramcount, Prior* prior ) :
     //
 }
 ParticleSwarmOptimiser::~ParticleSwarmOptimiser() {
-    deallocMatrix( &psoparams.velocityMin, paramcount );
-    deallocMatrix( &psoparams.velocityMax, paramcount );
-    if ( particle != nullptr ) {
-        for ( int k = 0; k < particlecount; k++ ) {
-            deallocMatrix(&particle[k].position,paramcount);
-            deallocMatrix(&particle[k].velocity,paramcount);
-            deallocMatrix(&particle[k].best.position,paramcount);
-            deallocMatrix(&particle[k].best.velocity,paramcount);
-            deallocMatrix(&particle[k].neighbourhoodbest.position,paramcount);
-            deallocMatrix(&particle[k].neighbourhoodbest.velocity,paramcount);
-            delete[] particle[k].neighbour;
-        }
-        delete[] particle;
-    }
-    deallocMatrix(&globalbest.position,paramcount);
-    deallocMatrix(&globalbest.velocity,paramcount);
 }
 void ParticleSwarmOptimiser::initialise() {
     
@@ -43,17 +27,17 @@ void ParticleSwarmOptimiser::initialise() {
     psoparams.c1=psoparams.chi*psoparams.phi1;      // Personal Learning Coefficient
     psoparams.c2=psoparams.chi*psoparams.phi2;
     psoparams.velocityRangeScale = 1.0;
-    psoparams.velocityMin = new datatype[paramcount];
-    psoparams.velocityMax = new datatype[paramcount];
+    psoparams.velocityMin = allocMatrix(paramcount);
+    psoparams.velocityMax = allocMatrix(paramcount);
     for ( int i = 0; i < paramcount; i++ ) {
         psoparams.velocityMin[i] = -psoparams.velocityRangeScale*prior[i].sd;
         psoparams.velocityMax[i] =  psoparams.velocityRangeScale*prior[i].sd;
     }
     
     // Convert priors to vectorised form
-    datatype* zeros = allocMatrix(paramcount);
-    datatype* priorMu = allocMatrix(paramcount);
-    datatype** priorVariance = allocMatrix(paramcount,paramcount);
+    M1 zeros = allocMatrix(paramcount);
+    M1 priorMu = allocMatrix(paramcount);
+    M2 priorVariance = allocMatrix(paramcount,paramcount);
     for ( int k = 0; k < paramcount; k++ ) {
         priorMu[k] = prior[k].mu;
         priorVariance[k][k] = prior[k].sd*prior[k].sd;
@@ -127,18 +111,13 @@ void ParticleSwarmOptimiser::initialise() {
         std::cout << "Best starting cost = " << bestcost << std::endl;
         std::cout << "Starting optimisation..." << std::endl;
     }
-    
-    // Cleanup
-    deallocMatrix(&zeros,paramcount);
-    deallocMatrix(&priorMu,paramcount);
-    deallocMatrix(&priorVariance,paramcount,paramcount);
 }
 void ParticleSwarmOptimiser::run() {
     // Initialise particles
     initialise();
     
-    datatype** unirndbest = allocMatrix(1,paramcount);
-    datatype** unirndneighbest = allocMatrix(1,paramcount);
+    M2 unirndbest = allocMatrix(1,paramcount);
+    M2 unirndneighbest = allocMatrix(1,paramcount);
     
     // Iterate until convergence
     bestcount = 0;
@@ -236,16 +215,12 @@ void ParticleSwarmOptimiser::run() {
         } else
             bestcount = 0;
     }
-    
-    // Cleanup
-    deallocMatrix(&unirndbest,1,paramcount);
-    deallocMatrix(&unirndneighbest,1,paramcount);
 }
 datatype ParticleSwarmOptimiser::getBestCost() {
     return globalbest.cost;
 }
-datatype* ParticleSwarmOptimiser::getBestPos() {
-    datatype* map = allocMatrix(paramcount);
+M1 ParticleSwarmOptimiser::getBestPos() {
+    M1 map = allocMatrix(paramcount);
     for ( int i = 0; i < paramcount; i++ )
         map[i] = globalbest.position[i];
     return map;

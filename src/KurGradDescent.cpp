@@ -20,6 +20,6 @@ KurGradDescent::~KurGradDescent() {
     //
 }
 
-datatype KurGradDescent::costFunction( datatype* state, MatrixManip::Prior* prior, int n ) {
+datatype KurGradDescent::costFunction( M1 state, MatrixManip::Prior* prior, int n ) {
     return kurf->negLogLikeliFcn( state, prior, n );
 }

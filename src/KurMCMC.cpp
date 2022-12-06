@@ -25,7 +25,7 @@ void KurMCMC::runThread( KuramotoUKF::KurfParams kurfparams, KuramotoUKF::ModelP
     KuramotoMCChain* mc = new KuramotoMCChain( kurf, mcmcparams );
     std::string filename = savedir + "/chain" + std::to_string(threadno) + ".txt";
     if ( threadno == 0 ) {
-        mc->saveMatrixToTextFile( savedir + "/out_proposal_thread0.txt", mc->covarProposal, mc->statedim, mc->statedim );
+        mc->saveMatrixToTextFile( savedir + "/out_proposal_thread0.txt", mc->covarProposal );
     }
     mc->run();
     mc->saveChain(filename);
@@ -34,15 +34,16 @@ void KurMCMC::runThread( KuramotoUKF::KurfParams kurfparams, KuramotoUKF::ModelP
     datatype* cost0 = new datatype;
     (*cost0) = mc->getMAPcost();
     (*cost) = cost0;
-    datatype* map0 = mc->getMAPstate();
-    (*map) = map0;
+    //datatype* map0
+    M1 Mmap0 = mc->getMAPstate();
+    (*map) = &Mmap0[0];
     
     // Clean-up
     delete mc;
     delete kurf;
 }
 
-datatype* KurMCMC::run( KuramotoUKF::KurfParams kurfparams, KuramotoUKF::ModelParamsSimple modelparams, MetropolisChain::MetropolisChainParams mcmcparams, int paramcount, MatrixManip::Prior* prior, int* paramPriorList, int n_priors, std::string loadfile, std::string savedir, int threadcount ) {
+M1 KurMCMC::run( KuramotoUKF::KurfParams kurfparams, KuramotoUKF::ModelParamsSimple modelparams, MetropolisChain::MetropolisChainParams mcmcparams, int paramcount, MatrixManip::Prior* prior, int* paramPriorList, int n_priors, std::string loadfile, std::string savedir, int threadcount ) {
     
     // Run burn-in on single thread and use adjusted covar proposal for final set
     if ( mcmcparams.tuneProposal ) {
@@ -64,7 +65,7 @@ datatype* KurMCMC::run( KuramotoUKF::KurfParams kurfparams, KuramotoUKF::ModelPa
         for ( int k = 0; k < mcmcparams.statedim; k++ )
             mcmcparams.covarProposal[k][k] = mc->covarProposal[k][k];
         // Save proposal to file
-        mc->saveMatrixToTextFile( savedir + "/out_tuned_proposal.txt", mc->covarProposal, mc->statedim, mc->statedim );
+        mc->saveMatrixToTextFile( savedir + "/out_tuned_proposal.txt", mc->covarProposal );
         // Turn off proposal tuning for main run
         mcmcparams.tuneProposal = false;
         mcmcparams.chainlength = chainlength;
@@ -107,7 +108,7 @@ datatype* KurMCMC::run( KuramotoUKF::KurfParams kurfparams, KuramotoUKF::ModelPa
     cout << "Best solution has cost = " << bestCost << endl;
     
     // Allocate new memory location for MAP estimate
-    datatype* bestmap = MatrixManip::allocMatrix(n_priors);
+    M1 bestmap = MatrixManip::allocMatrix(n_priors);
     for ( int k = 0; k < n_priors; k++ )
         bestmap[k] = maps[bestIndex][k];
     //MatrixManip::printVector( bestmap, n_priors );

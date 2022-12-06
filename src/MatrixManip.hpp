@@ -17,25 +17,42 @@
 #include <cassert>
 #include <cstdlib>
 #include <ctime>
+#include <vector>
+#include <limits>
 
-#define datatype double
-#define getmax(a,b) ((a)>(b)?(a):(b))
-#define getmin(a,b) ((a)<(b)?(a):(b))
+using namespace std;
+
+using datatype=double;
+
+using M1=std::vector<datatype>;
+using M2=std::vector<M1>;
+using M3=std::vector<M2>;
+using M4=std::vector<M3>;
 
 static const datatype pi = 3.14159265359;
 static const datatype twopi = 2*pi;
-static const datatype logtwopi = log(2*pi);
+static const datatype logtwopi = log(twopi);
+
+template<class T>
+T getmax(T a, T b) {
+  return (a)>(b)?(a):(b);
+}
+
+template<class T>
+T getmin(T a, T b) {
+  return ((a)<(b)?(a):(b));
+}
 
 class MatrixManip {
 private:
     datatype logtwopi;
     
     int persistentLogLikeliMVNdim = -1;
-    datatype** persistentLogLikeliMVNe = nullptr;
-    datatype** persistentLogLikeliMVNeT = nullptr;
-    datatype** persistentLogLikeliMVNiS = nullptr;
-    datatype** persistentLogLikeliMVNeiS = nullptr;
-    datatype** persistentLogLikeliMVNMahalanobisSqr = nullptr;
+    M2 persistentLogLikeliMVNe;
+    M2 persistentLogLikeliMVNeT;
+    M2 persistentLogLikeliMVNiS;
+    M2 persistentLogLikeliMVNeiS;
+    M2 persistentLogLikeliMVNMahalanobisSqr;
 public:
     
     struct Prior {
@@ -46,58 +63,57 @@ public:
     
     MatrixManip();
     ~MatrixManip();
-    template <class T=datatype> static void cholesky(T **A, int n, T** L);
-    template <class T=datatype> static T** mateye( int n );
-    template <class T=datatype> static T** mateye( int n, T value );
-    template <class T=datatype> static void mattranspose( T** A, int n1, int n2, T** D );
-    template <class T=datatype> static void matmult( T** A, int na1, int na2, T** B, int nb1, int nb2, T** D );
-    template <class T=datatype> static void matmult( T** A, int na1, int na2, T* B, int nb1, T* D );
-    template <class T=datatype> static void matmultbyscalar( T** A, int dim1, int dim2, T scale, T** D );
-    template <class T=datatype> static void matdivr( T** A, int na1, int na2, T** B, int nb1, int nb2, T** D );
-    template <class T=datatype> static void matinvByHand2D( T ** A, T** D );
-    template <class T=datatype> static void matinv( T ** A, int n, T** D );
-    template <class T=datatype> static void matinvPD( T** A, int n, T** D );
-    template <class T=datatype> static void matinvDiag( T** A, int n, T** D );
-    template <class T=datatype> static void matinvL( T** A, int n, T** D );
-    template <class T=datatype> static void matadd( T** A, T** B, int dim1, int dim2, T** D );
-    template <class T=datatype> static void matsub( T** A, T** B, int dim1, int dim2, T** D );
-    template <class T=datatype> static void printVector( T* x, int n );
-    template <class T=datatype> static void printVector( int* x, int n );
-    template <class T=datatype> static void printMatrix( T* X, int n );
-    template <class T=datatype> static void printMatrix( T** X, int n1, int n2 );
-    template <class T=datatype> static void outerproduct( T* x, int n, T** D );
-    template <class T=datatype> static void outerproduct( T** x, int n1, int n2, T** D );
-    template <class T=datatype> static void outerproduct( T* x, int nx, T* y, int ny, T** D );
-    template <class T=datatype> static T* allocVector( int dim );
-    template <class T=datatype> static T* allocMatrix( int dim );
-    template <class T=datatype> static T** allocMatrix( int dim1, int dim2 );
-    template <class T=datatype> static T*** allocMatrix( int dim1, int dim2, int dim3 );
-    template <class T=datatype> static void deallocMatrix( T** M, int dim );
-    template <class T=datatype> static void deallocMatrix( T*** M, int dim1, int dim2 );
-    template <class T=datatype> static void deallocMatrix( T**** M, int dim1, int dim2, int dim3 );
-    template <class T=datatype> void uniformrand( int dim1, int dim2, T **u );
-    template <class T=datatype> void boxmuller( T** u, int dim, T* z );
-    template <class T=datatype> void mvnrand( T* mu, int dim, T** Sigma, T* x );
-    template <class T=datatype> T randn( T mu, T sd );
-    template <class T=datatype> T randUniform( );
-    template <class T=datatype> T logRandUniform( );
-    template <class T=datatype> T logdetPD( T** X, int n );
-    template <class T=datatype> T logLikeliMVN( T* state, int statedim, T* mu, T** Sigma );
-    template <class T=datatype> T logLikeliMVNpersistent( T* x, int n, T* mu, T** Sigma );
-    template <class T=datatype> void testRandomNumberGenerators( const std::string filestem );
-    template <class T=datatype> void writeMatrixToFile( const std::string filename, T** x, int dim1, int dim2 );
-    template <class T=datatype> static T normLikeli( T x, T mu, T sd );
-    template <class T=datatype> static T logLikeliPriors( T* state, Prior* prior, int n );
-    template <class T=datatype> static void printPriors( Prior* prior, int n );
-    template <class T=datatype> static T matrms( T* x, int n );
-    template <class T=datatype> static void saveVectorToTextFile( std::string filename, T* D, int dim );
-    template <class T=datatype> static void saveMatrixToTextFile( std::string filename, T* D, int dim );
-    template <class T=datatype> static T* loadVectorFromTextFile( std::string filename, int expected_dim );
-    template <class T=datatype> static void saveMatrixToTextFile( std::string filename, T** D, int dim1, int dim2 );
-    template <class T=datatype> static T** loadMatrixFromTextFile( std::string filename, int expected_dim1, int expected_dim2 );
-    template <class T=datatype> static void saveMatrixToTextFile( std::string filename, T*** D, int dim1, int dim2, int dim3 );
+    static void cholesky(M2 A, M2 L);
+    static M2 mateye( int n );
+    static M2 mateye( int n, datatype value );
+    static void mattranspose( M2 A, M2 D );
+    static void matmult( M2 A, M2 B, M2 D );
+    static void matmult( M2 A, M1 B, M1 D );
+    static void matmultbyscalar( M2 A, datatype scale, M2& D );
+    static void matdivr( M2 A, M2 B, M2 D );
+    static void matinvByHand2D( M2 A, M2 D );
+    static void matinv( M2 A, int n, M2& D );
+    static void matinvPD( M2 A, M2 D );
+    static void matinvDiag( M2 A, M2 D );
+    static void matinvL( M2 A, M2 D );
+    static void matadd( M2 A, M2 B, M2& D );
+    static void matsub( M2 A, M2 B, M2& D );
+    static void printVector( M1 x );
+    static void printVector( int* x, int n );
+    static void printMatrix( M1 X );
+    static void printMatrix( M2 X );
+    static void outerproduct( M1 x, M2& D );
+    static void outerproduct( M2 x, M2& D );
+    static void outerproduct( M1 x, M1 y, M2& D );
+    static M1 allocVector( int dim );
+    static M1 allocMatrix( int dim );
+    static M2 allocMatrix( int dim1, int dim2 );
+    static M3 allocMatrix( int dim1, int dim2, int dim3 );
+    static void deallocMatrix( M1 M );
+    static void deallocMatrix( M2 M );
+    static void deallocMatrix( M3 M );
+    void uniformrand( int dim1, int dim2, M2 u );
+    void boxmuller( M2 u, int dim, M1& z );
+    void mvnrand( M1 mu, int dim, M2 Sigma, datatype& x );
+    void mvnrand( M1 mu, int dim, M2 Sigma, M1& x );
+    datatype randn( datatype mu, datatype sd );
+    datatype randUniform( );
+    datatype logRandUniform( );
+    datatype logdetPD( M2 X, int n );
+    datatype logLikeliMVN( M1 state, int statedim, M1 mu, M2 Sigma );
+    datatype logLikeliMVNpersistent( M1 x, int n, M1 mu, M2 Sigma );
+    void testRandomNumberGenerators( const std::string filestem );
+    void writeMatrixToFile( const std::string filename, M2 x, int dim1, int dim2 );
+    static datatype normLikeli( datatype x, datatype mu, datatype sd );
+    static datatype logLikeliPriors( M1 state, Prior* prior, int n );
+    static void printPriors( Prior* prior, int n );
+    static datatype matrms( M1 x, int n );
+    static void saveVectorToTextFile( std::string filename, M1 D );
+    static void saveMatrixToTextFile( std::string filename, M1 D );
+    static M1 loadVectorFromTextFile( std::string filename, int expected_dim );
+    static void saveMatrixToTextFile( std::string filename, M2 D );
+    static M2 loadMatrixFromTextFile( std::string filename, int expected_dim1, int expected_dim2 );
+    static void saveMatrixToTextFile( std::string filename, M3 D );
 };
 
-#include "MatrixManip.inl"
-
-#endif /* MatrixManip_hpp */
+#endif

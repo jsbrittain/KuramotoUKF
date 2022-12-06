@@ -13,7 +13,7 @@ GradDescent::GradDescent( int paramcount, MatrixManip::Prior* prior ) : paramcou
 }
 GradDescent::GradDescent( int paramcount, MatrixManip::Prior* prior, Method method ) : paramcount(paramcount), prior(prior), method(method) {
 }
-void GradDescent::setStartingPosition( datatype* x0 ) {
+void GradDescent::setStartingPosition( M1 x0 ) {
     x = MatrixManip::allocMatrix(paramcount);
     for ( int k = 0; k < paramcount; k++ )
         x[k] = x0[k];
@@ -32,20 +32,20 @@ void GradDescent::run() {
     }
     
     // Allocate memory
-    datatype *newx = MatrixManip::allocMatrix(paramcount);
-    datatype *xp = MatrixManip::allocMatrix(paramcount);
-    datatype *xm = MatrixManip::allocMatrix(paramcount);
-    datatype *dCdx = MatrixManip::allocMatrix(paramcount);
-    datatype *dx = MatrixManip::allocMatrix(paramcount);
+    M1 newx = MatrixManip::allocMatrix(paramcount);
+    M1 xp = MatrixManip::allocMatrix(paramcount);
+    M1 xm = MatrixManip::allocMatrix(paramcount);
+    M1 dCdx = MatrixManip::allocMatrix(paramcount);
+    M1 dx = MatrixManip::allocMatrix(paramcount);
     for ( int i = 0; i < paramcount; i++ ) dx[i] = 1e-5;//sdscaling*prior[i].sd;
     datatype newcost, lastcost, propchange;
     datatype beta1t = 0, newbeta1t = 0, beta2t = 0, newbeta2t = 0, mhat, vhat;
-    datatype *v = MatrixManip::allocMatrix(paramcount);
-    datatype *newv = MatrixManip::allocMatrix(paramcount);
-    datatype *m = MatrixManip::allocMatrix(paramcount);
-    datatype *newm = MatrixManip::allocMatrix(paramcount);
-    datatype *cache = MatrixManip::allocMatrix(paramcount);
-    datatype *newcache = MatrixManip::allocMatrix(paramcount);
+    M1 v = MatrixManip::allocMatrix(paramcount);
+    M1 newv = MatrixManip::allocMatrix(paramcount);
+    M1 m = MatrixManip::allocMatrix(paramcount);
+    M1 newm = MatrixManip::allocMatrix(paramcount);
+    M1 cache = MatrixManip::allocMatrix(paramcount);
+    M1 newcache = MatrixManip::allocMatrix(paramcount);
 
     // Initial conditions
     cost = costFunction(x, prior, paramcount);
@@ -146,18 +146,11 @@ void GradDescent::run() {
             break;
         k++;
     }
-    
-    // Tidy up
-    MatrixManip::deallocMatrix( &newx, paramcount );
-    MatrixManip::deallocMatrix( &xp,   paramcount );
-    MatrixManip::deallocMatrix( &xm,   paramcount );
-    MatrixManip::deallocMatrix( &dCdx, paramcount );
-    MatrixManip::deallocMatrix( &dx,   paramcount );
 }
 datatype GradDescent::getCost() {
     return cost;
 }
-datatype* GradDescent::getPos() {
+M1 GradDescent::getPos() {
     return x;
 }
 void GradDescent::setVerbose( bool value ) {
@@ -167,13 +160,12 @@ void GradDescent::setVerbose( bool value ) {
 
 
 void GradDescent::calcHessian() {
-    MatrixManip::deallocMatrix( &hess, paramcount, paramcount );
     hess = MatrixManip::allocMatrix( paramcount, paramcount );
-    datatype* xpp = MatrixManip::allocMatrix( paramcount );
-    datatype* xmm = MatrixManip::allocMatrix( paramcount );
-    datatype* xmp = MatrixManip::allocMatrix( paramcount );
-    datatype* xpm = MatrixManip::allocMatrix( paramcount );
-    datatype *dx  = MatrixManip::allocMatrix( paramcount );
+    M1 xpp = MatrixManip::allocMatrix( paramcount );
+    M1 xmm = MatrixManip::allocMatrix( paramcount );
+    M1 xmp = MatrixManip::allocMatrix( paramcount );
+    M1 xpm = MatrixManip::allocMatrix( paramcount );
+    M1 dx  = MatrixManip::allocMatrix( paramcount );
     for ( int i = 0; i < paramcount; i++ ) dx[i] = 1e-5;//sdscaling*prior[i].sd;
     int progress = 0, newprogress = 0, iter = 0, totaliter = paramcount + paramcount*(paramcount-1)/2;
     
@@ -212,35 +204,28 @@ void GradDescent::calcHessian() {
     std::cout << ">" << std::endl;
     
     if ( verbose ) {
-        MatrixManip::printMatrix( hess, paramcount, paramcount );
+        MatrixManip::printMatrix( hess );
     }
-    
-    // Tidy-up
-    MatrixManip::deallocMatrix( &xpp, paramcount );
-    MatrixManip::deallocMatrix( &xmm, paramcount );
-    MatrixManip::deallocMatrix( &xmp, paramcount );
-    MatrixManip::deallocMatrix( &xpm, paramcount );
-    MatrixManip::deallocMatrix( &dx,  paramcount );
 }
-void GradDescent::saveToFile( datatype** D, std::string filename ) {
-    MatrixManip::saveMatrixToTextFile(filename, D, paramcount, paramcount);
+void GradDescent::saveToFile( M2 D, std::string filename ) {
+    MatrixManip::saveMatrixToTextFile(filename, D);
 }
-datatype** GradDescent::getHessian() {
+M2 GradDescent::getHessian() {
     return hess;
 }
-datatype** GradDescent::getRegularisedHessian() {
-    datatype** cholhess = MatrixManip::allocMatrix(paramcount,paramcount);
-    MatrixManip::cholesky(hess, paramcount, cholhess);
-    datatype** cholhessT = MatrixManip::allocMatrix(paramcount,paramcount);
-    MatrixManip::mattranspose(cholhess, paramcount, paramcount, cholhessT);
-    datatype** reghess = MatrixManip::allocMatrix(paramcount,paramcount);
-    MatrixManip::matmult(cholhess, paramcount, paramcount, cholhessT, paramcount, paramcount, reghess);
-    MatrixManip::deallocMatrix(&cholhess, paramcount, paramcount);
-    MatrixManip::deallocMatrix(&cholhessT, paramcount, paramcount);
+M2 GradDescent::getRegularisedHessian() {
+    M2 cholhess = MatrixManip::allocMatrix(paramcount,paramcount);
+    MatrixManip::cholesky(hess, cholhess);
+    M2 cholhessT = MatrixManip::allocMatrix(paramcount,paramcount);
+    MatrixManip::mattranspose(cholhess, cholhessT);
+    M2 reghess = MatrixManip::allocMatrix(paramcount,paramcount);
+    MatrixManip::matmult(cholhess, cholhessT, reghess);
+    MatrixManip::deallocMatrix(cholhess);
+    MatrixManip::deallocMatrix(cholhessT);
     return reghess;
 }
-datatype** GradDescent::getInverseHessian() {
-    datatype** invhess = MatrixManip::allocMatrix(paramcount,paramcount);
-    MatrixManip::matinvPD(hess, paramcount, invhess);
+M2 GradDescent::getInverseHessian() {
+    M2 invhess = MatrixManip::allocMatrix(paramcount,paramcount);
+    MatrixManip::matinvPD(hess, invhess);
     return invhess;
 }

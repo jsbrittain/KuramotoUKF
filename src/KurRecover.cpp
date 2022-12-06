@@ -22,7 +22,7 @@ void KurRecover::generateData( KuramotoUKF::ModelParamsSimple modelparams, std::
     
     // Get (and print) initial states for generating data
     int n_priors;
-    datatype* priorvec = kuramoto.priorsToPriorVec( prior, &n_priors );
+    M1 priorvec = kuramoto.priorsToPriorVec( prior, &n_priors );
     cout << "Number of priors: " << n_priors << endl;
     
     // Select parameters randomly from prior distributions
@@ -36,7 +36,7 @@ void KurRecover::generateData( KuramotoUKF::ModelParamsSimple modelparams, std::
     
     cout << "Initialise" << endl;
     kuramoto.initialise(modelparams.n_obs,6000);
-    datatype* paramvec = kuramoto.priorVecToParamVec( priorvec, paramPriorList );
+    M1 paramvec = kuramoto.priorVecToParamVec( priorvec, paramPriorList );
     KuramotoUKF::stateConditions* statecond = kuramoto.unpackParamVec(paramvec);
     
     kuramoto.setInitialConditions( statecond );
@@ -44,7 +44,7 @@ void KurRecover::generateData( KuramotoUKF::ModelParamsSimple modelparams, std::
     
     kuramoto.saveObs(    savedir + "/gen_y.txt" );
     kuramoto.saveStates( savedir + "/gen_x.txt" );
-    kuramoto.saveVectorToTextFile( savedir + "/out_params.txt", priorvec, n_priors );
+    kuramoto.saveVectorToTextFile( savedir + "/out_params.txt", priorvec );
     
     kuramoto.reset();
     
@@ -56,7 +56,7 @@ void KurRecover::generateData( KuramotoUKF::ModelParamsSimple modelparams, std::
     
     cout << " Neg log likeli (without priors): " << kuramoto.negLogLikeliFcn(priorvec) << endl;
     cout << " Neg log likeli (with priors):    " << kuramoto.negLogLikeliFcn(priorvec, prior, n_priors) << endl;
-    MatrixManip::printVector(priorvec, n_priors);
+    MatrixManip::printVector(priorvec);
 }
 
 void KurRecover::parameterRecovery( KuramotoUKF::ModelParamsSimple modelparams, Options options ) {
@@ -64,7 +64,7 @@ void KurRecover::parameterRecovery( KuramotoUKF::ModelParamsSimple modelparams, 
     /// Initialise KuramotoUKF model to get generated parameters (such as prior counts)
     
     // Construct Kuromoto UKF
-    datatype* stateMAP = nullptr;
+    M1 stateMAP;
     KuramotoUKF kuramoto( modelparams.kurfparams );
     kuramoto.readMeasurementFile( options.loadfile, 1 );
     if ( options.useRmsSigmay ) {
@@ -78,15 +78,15 @@ void KurRecover::parameterRecovery( KuramotoUKF::ModelParamsSimple modelparams, 
     KuramotoUKF::Prior *prior = kuramoto.getPriors();
     int* paramPriorList = kuramoto.getParamPriorList();
     int n_priors;
-    datatype* priorvec = kuramoto.priorsToPriorVec( prior, &n_priors );
-    datatype* paramvec = kuramoto.priorVecToParamVec( priorvec, paramPriorList );
+    M1 priorvec = kuramoto.priorsToPriorVec( prior, &n_priors );
+    M1 paramvec = kuramoto.priorVecToParamVec( priorvec, paramPriorList );
     KuramotoUKF::stateConditions* statecond = kuramoto.unpackParamVec(paramvec);
     // Check if initial state file is specified
     if ( options.initstatefile.compare("") != 0 ) {
         if ( options.verbose )
             std::cout << "Loading initial state from file: " << options.initstatefile << std::endl;
         stateMAP = loadinitstates(options.initstatefile, n_priors);
-        MatrixManip::printMatrix(stateMAP, n_priors);
+        MatrixManip::printMatrix(stateMAP);
         if ( options.verbose ) {
             std::cout << "Initialised KuramotoUKF gives neg-log-likeli (without priors): " << kuramoto.negLogLikeliFcn(stateMAP) << std::endl;
             std::cout << "Initialised KuramotoUKF gives neg-log-likeli (with priors): " << kuramoto.negLogLikeliFcn(stateMAP, prior, n_priors) << std::endl;
@@ -100,18 +100,18 @@ void KurRecover::parameterRecovery( KuramotoUKF::ModelParamsSimple modelparams, 
     
     if ( options.do_pso ) {
         KurPSOchains kurpsochains;
-        if ( stateMAP == nullptr )
+        if ( stateMAP.size() == 0 )
             stateMAP = MatrixManip::allocMatrix(n_priors);
         stateMAP = kurpsochains.run( modelparams, kuramoto.n_priors, prior, paramPriorList, n_priors, options.loadfile, options.savedir, options.threadcount );
         // Backup MAP
-        MatrixManip::saveMatrixToTextFile(options.savedir + "/out_params_pso.txt", stateMAP, n_priors);
+        MatrixManip::saveMatrixToTextFile(options.savedir + "/out_params_pso.txt", stateMAP);
         
     }
     
     // Gradient descent
     
     KurGradDescent kurgraddescent( &kuramoto, n_priors, prior, options.grad_method );
-    if ( stateMAP != nullptr )
+    if ( stateMAP.size() > 0 )
         kurgraddescent.setStartingPosition( stateMAP );
     else {
         stateMAP = MatrixManip::allocMatrix(n_priors);
@@ -123,24 +123,24 @@ void KurRecover::parameterRecovery( KuramotoUKF::ModelParamsSimple modelparams, 
     datatype costMAP = kurgraddescent.getCost();
     if ( options.verbose )
         cout << "Gradient Descent cost: " << costMAP << " at:" << endl;
-    MatrixManip::printMatrix(stateMAP, n_priors);
+    MatrixManip::printMatrix(stateMAP);
     // Backup MAP
     if ( options.grad_method != KurGradDescent::Method::passthrough )
-        MatrixManip::saveMatrixToTextFile(options.savedir + "/out_params_grad.txt", stateMAP, n_priors);
+        MatrixManip::saveMatrixToTextFile(options.savedir + "/out_params_grad.txt", stateMAP);
     
     // Hessian
     
-    datatype** invhess = nullptr;
+    M2 invhess;
     if ( options.do_hess ) {
         kurgraddescent.calcHessian();
         kurgraddescent.saveToFile( kurgraddescent.getHessian(), options.savedir + "/hess.txt" );
-        datatype** hess = MatrixManip::allocMatrix(n_priors,n_priors);
+        M2 hess = MatrixManip::allocMatrix(n_priors,n_priors);
         hess = kurgraddescent.getHessian();
         
         // Use Laplace approximation for MCMC proposals
         invhess = kurgraddescent.getInverseHessian( );
         kurgraddescent.saveToFile( invhess, options.savedir + "/invhess.txt" );
-        MatrixManip::printMatrix(invhess, n_priors, n_priors);
+        MatrixManip::printMatrix(invhess);
         
         // Check that derived covar is +ve definite, otherwise reject
         bool valid_hess = true;
@@ -153,7 +153,7 @@ void KurRecover::parameterRecovery( KuramotoUKF::ModelParamsSimple modelparams, 
     
     // MCMC interrogation
     
-    datatype** covarProposal = MatrixManip::allocMatrix( n_priors, n_priors );
+    M2 covarProposal = MatrixManip::allocMatrix( n_priors, n_priors );
     for ( int i = 0; i < n_priors; i++ ) {
         if ( options.do_hess ) {
             // Get from Laplace approximation
@@ -168,7 +168,7 @@ void KurRecover::parameterRecovery( KuramotoUKF::ModelParamsSimple modelparams, 
     
     // Load proposal distribution from file (if specified)
     if ( options.mcmc.proposalfile.compare("") != 0 ) {
-        MatrixManip::deallocMatrix(&covarProposal, n_priors, n_priors);
+        MatrixManip::deallocMatrix(covarProposal);
         covarProposal = loadproposal( options.mcmc.proposalfile, n_priors );
         for ( int k = 0; k < n_priors; k++ ) {
             //covarProposal[k][k] /= 10;
@@ -211,16 +211,16 @@ void KurRecover::parameterRecovery( KuramotoUKF::ModelParamsSimple modelparams, 
     
     // Clean-up
     delete[] paramPriorList;
-    delete[] priorvec;
-    delete[] paramvec;
+    //delete[] priorvec;
+    //delete[] paramvec;
 }
 
-void KurRecover::saveParams( std::string filename, datatype* x, int n ) {
-    MatrixManip::saveVectorToTextFile(filename, x, n);
+void KurRecover::saveParams( std::string filename, M1 x, int n ) {
+    MatrixManip::saveVectorToTextFile(filename, x);
 }
 
-datatype* KurRecover::loadinitstates( std::string filename, int expected_states ) {
-    datatype* x = MatrixManip::allocMatrix(expected_states);
+M1 KurRecover::loadinitstates( std::string filename, int expected_states ) {
+    M1 x = MatrixManip::allocMatrix(expected_states);
     std::ifstream myfile(filename,std::ifstream::binary);
     if (myfile.is_open()) {
         // Count number of params in file
@@ -239,8 +239,8 @@ datatype* KurRecover::loadinitstates( std::string filename, int expected_states 
         assert( "Cannot open initial states file." );
     return x;
 }
-datatype** KurRecover::loadproposal( std::string filename, int n ) {
-    datatype** x = MatrixManip::allocMatrix(n,n);
+M2 KurRecover::loadproposal( std::string filename, int n ) {
+    M2 x = MatrixManip::allocMatrix(n,n);
     std::ifstream myfile(filename,std::ifstream::binary);
     if (myfile.is_open()) {
         // Count number of params in file

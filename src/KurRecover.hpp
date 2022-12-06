@@ -39,10 +39,10 @@ public:
     
     void generateData( KuramotoUKF::ModelParamsSimple modelparams, std::string savedir );
     void parameterRecovery( KuramotoUKF::ModelParamsSimple modelparams, Options options );
-    void saveParams( std::string filename, datatype* x, int n );
-    datatype* loadinitstates( std::string filename, int expected_states );
-    datatype** loadproposal( std::string filename, int n );
-    void saveproposal( std::string filename, double** P, int n );
+    void saveParams( std::string filename, M1 x, int n );
+    M1 loadinitstates( std::string filename, int expected_states );
+    M2 loadproposal( std::string filename, int n );
+    void saveproposal( std::string filename, M2 P, int n );
 };
 
 #endif /* KurRecover_hpp */

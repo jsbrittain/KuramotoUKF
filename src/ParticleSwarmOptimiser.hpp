@@ -16,18 +16,19 @@ class ParticleSwarmOptimiser : public MatrixManip {
 public:
     struct PSOparams {
         datatype phi1, phi2, phi, chi, w, wdamp, c1, c2;
-        datatype velocityRangeScale, *velocityMin, *velocityMax;
+        datatype velocityRangeScale;
+        M1 velocityMin, velocityMax;
         int convreps = 8, verbose = 1;
         datatype convthreshold = (0.01)/100;
     };
     struct particleStruct {
-        datatype* position = nullptr;
-        datatype* velocity = nullptr;
+        M1 position;
+        M1 velocity;
         datatype cost;
         int* neighbour = nullptr;
         struct {
-            datatype* position = nullptr;
-            datatype* velocity = nullptr;
+            M1 position;
+            M1 velocity;
             datatype cost;
         } best, neighbourhoodbest;
     };
@@ -48,9 +49,9 @@ public:
     ~ParticleSwarmOptimiser();
     void initialise();
     void run();                  // Returns vectors of optimised parameter values
-    virtual datatype costFunction( datatype* state, Prior* prior, int n ) { return 0; };
+    virtual datatype costFunction( M1 state, Prior* prior, int n ) { return 0; };
     datatype getBestCost();
-    datatype* getBestPos();
+    M1 getBestPos();
 };
 
 #endif /* ParticleSwarmOptimiser_hpp */

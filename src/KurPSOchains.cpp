@@ -28,8 +28,8 @@ void KurPSOchains::runThread( KuramotoUKF::ModelParamsSimple modelparams, int pa
     datatype* cost0 = new datatype;
     (*cost0) = kurpso->getBestCost();
     (*cost) = cost0;
-    datatype* map0 = kurpso->getBestPos();
-    (*map) = map0;
+    M1 Mmap0 = kurpso->getBestPos();
+    (*map) = &Mmap0[0];
     
     cout << "MAP estimate, neg-log-likeli = " << *cost0 << endl;
     //MatrixManip::printVector( map0, paramcount );
@@ -44,7 +44,7 @@ void KurPSOchains::runThread( KuramotoUKF::ModelParamsSimple modelparams, int pa
     delete kurf;
 }
 
-datatype* KurPSOchains::run( KuramotoUKF::ModelParamsSimple modelparams, int paramcount, KurPSO::Prior* prior, int* paramPriorList, int n_priors, std::string loadfile, std::string savedir, int threadcount ) {
+M1 KurPSOchains::run( KuramotoUKF::ModelParamsSimple modelparams, int paramcount, KurPSO::Prior* prior, int* paramPriorList, int n_priors, std::string loadfile, std::string savedir, int threadcount ) {
     
     // Form pointer array for return values from threads
     datatype** maps = new datatype*[threadcount];
@@ -76,7 +76,7 @@ datatype* KurPSOchains::run( KuramotoUKF::ModelParamsSimple modelparams, int par
     cout << "Best solution has cost = " << bestCost << endl;
     
     // Allocate new memory location for MAP estimate
-    datatype* bestmap = MatrixManip::allocMatrix(n_priors);
+    M1 bestmap = MatrixManip::allocMatrix(n_priors);
     for ( int k = 0; k < n_priors; k++ )
         bestmap[k] = maps[bestIndex][k];
     //MatrixManip::printVector( bestmap, n_priors );
