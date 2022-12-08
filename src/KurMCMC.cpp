@@ -88,23 +88,37 @@ M1 KurMCMC::run(
     
     // Form pointer array for return values from threads
     std::vector<std::shared_ptr<M1>> maps(threadcount,make_shared<M1>());
-    std::vector<std::shared_ptr<datatype>> costs(threadcount);
+    std::vector<std::shared_ptr<datatype>> costs(threadcount,make_shared<datatype>());
     
     // Initialise threads list
     std::vector<std::thread> mcmcThreads(threadcount);
     
     // Call threads
-    for ( int threadno = 0; threadno < threadcount; threadno++ )
-        mcmcThreads[threadno] = std::thread( &KurMCMC::runThread, this, kurfparams, modelparams, mcmcparams, paramcount, prior, paramPriorList, n_priors, loadfile, savedir, maps[threadno], costs[threadno], threadno );
+    for (int threadno=0; threadno<threadcount; threadno++)
+        mcmcThreads[threadno] = std::thread(
+            &KurMCMC::runThread,
+            this,
+            kurfparams,
+            modelparams,
+            mcmcparams,
+            paramcount,
+            prior,
+            paramPriorList,
+            n_priors,
+            loadfile,
+            savedir,
+            maps[threadno],
+            costs[threadno],
+            threadno );
     
     // Join threads
-    for ( int threadno = 0; threadno < threadcount; threadno++ )
+    for (int threadno=0; threadno<threadcount; threadno++)
         mcmcThreads[threadno].join();
     
     // Evaluate best solution to return
     datatype bestCost = *costs[0];
     int bestIndex = 0;
-    for ( int k = 1; k < threadcount; k++ )
+    for (int k=1; k<threadcount; k++)
         if ( (*costs[k]) < bestCost ) {
             bestCost = (*costs[k]);
             bestIndex = k;
@@ -112,9 +126,7 @@ M1 KurMCMC::run(
     cout << "Best solution has cost = " << bestCost << endl;
     
     // Allocate new memory location for MAP estimate
-    M1 bestmap = MatrixManip::allocMatrix(n_priors);
-    for ( int k = 0; k < n_priors; k++ )
-        bestmap[k] = (*maps[bestIndex])[k];
+    M1 bestmap = *maps[bestIndex];
     
     // Return MAP estimate of parameters
     return bestmap;

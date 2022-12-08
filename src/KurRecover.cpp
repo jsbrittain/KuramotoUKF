@@ -35,12 +35,13 @@ void KurRecover::generateData( KuramotoUKF::ModelParamsSimple modelparams, std::
     //// Generate data ////
     
     cout << "Initialise" << endl;
-    kuramoto.initialise(modelparams.n_obs,6000);
+    int samplecount = 200;
+    kuramoto.initialise(modelparams.n_obs,samplecount);
     M1 paramvec = kuramoto.priorVecToParamVec( priorvec, paramPriorList );
     KuramotoUKF::stateConditions statecond = kuramoto.unpackParamVec(paramvec);
     
     kuramoto.setInitialConditions( statecond );
-    kuramoto.generate(6000);
+    kuramoto.generate(samplecount);
     
     kuramoto.saveObs(    savedir + "/gen_y.txt" );
     kuramoto.saveStates( savedir + "/gen_x.txt" );

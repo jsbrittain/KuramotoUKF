@@ -59,7 +59,7 @@ M1 KurPSOchains::run(
 {
     // Form pointer array for return values from threads
     std::vector<std::shared_ptr<M1>> maps(threadcount,make_shared<M1>());
-    std::vector<std::shared_ptr<datatype>> costs(threadcount);
+    std::vector<std::shared_ptr<datatype>> costs(threadcount,make_shared<datatype>());
 
     // Initialise threads list
     std::vector<std::thread> psoThreads(threadcount);
@@ -80,12 +80,10 @@ M1 KurPSOchains::run(
             bestCost = (*costs[k]);
             bestIndex = k;
         }
-    cout << "Best solution has cost = " << bestCost << endl;
+    cout << "Best solution [" << bestIndex << "] has cost = " << bestCost << endl;
     
     // Allocate new memory location for MAP estimate
-    M1 bestmap = MatrixManip::allocMatrix(n_priors);
-    for ( int k = 0; k < n_priors; k++ )
-        bestmap[k] = (*maps[bestIndex])[k];
+    M1 bestmap = *maps[bestIndex];
     
     // Return MAP estimate of parameters
     return bestmap;

@@ -638,9 +638,9 @@ void KuramotoUKF::printStateCond( stateConditions statecond ) {
     printMatrix(statecond.obsNoise);
 }
 M1 KuramotoUKF::priorsToPriorVec( std::vector<Prior> prior ) {
-    int n_priors = KuramotoUKF::n_priors;
+    size_t n_priors = prior.size(); 
     M1 x(n_priors);
-    for ( int k = 0; k < n_priors; k++ )
+    for (size_t k = 0; k < n_priors; k++)
         x[k] = prior[k].mu;
     return x;
 }

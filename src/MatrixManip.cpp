@@ -370,8 +370,8 @@ datatype MatrixManip::normLikeli( datatype x, datatype mu, datatype sd ) {
     }
 }
 datatype MatrixManip::logLikeliPriors( M1 state, std::vector<Prior> prior ) {
+    assert(state.size() <= prior.size());
     datatype logLikeli = 0.0;
-    int n = prior.size();
     for (size_t k = 0; k<prior.size(); k++)
         logLikeli += normLikeli( state[k], prior[k].mu, prior[k].sd );
     return logLikeli;
