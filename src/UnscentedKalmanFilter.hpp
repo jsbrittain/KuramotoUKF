@@ -69,8 +69,8 @@ public:
     UnscentedKalmanFilter();
     ~UnscentedKalmanFilter();
     void reset();
-    virtual void stateTransitionFunction( M1 x, M1& xpred ) {};
-    virtual void observationFunction( M1 x, M1& y ) {};
+    virtual void stateTransitionFunction( M1 x, M1& xpred ) = 0;
+    virtual void observationFunction( M1 x, M1& y ) = 0;
     void genSigmaX( M1 x, M2 P, int dim, M2 sigmaX );
     void genSigmaW( );
     void sqrtPscaled(M2 L);

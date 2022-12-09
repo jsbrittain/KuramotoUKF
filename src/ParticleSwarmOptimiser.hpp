@@ -49,7 +49,7 @@ public:
     ~ParticleSwarmOptimiser();
     void initialise();
     void run();                  // Returns vectors of optimised parameter values
-    virtual datatype costFunction( M1 state, std::vector<Prior> prior, int n ) { return 0; };
+    virtual datatype costFunction( M1 state, std::vector<Prior> prior, int n ) = 0;
     datatype getBestCost();
     M1 getBestPos();
 };

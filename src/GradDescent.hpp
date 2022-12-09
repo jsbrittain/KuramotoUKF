@@ -39,7 +39,7 @@ public:
     
     GradDescent( int paramcount, std::vector<MatrixManip::Prior> prior );
     GradDescent( int paramcount, std::vector<MatrixManip::Prior> prior, Method method );
-    virtual datatype costFunction( M1 state, std::vector<MatrixManip::Prior> prior, int n ) { return 0; };
+    virtual datatype costFunction( M1 state, std::vector<MatrixManip::Prior> prior, int n ) = 0;
     void setStartingPosition( M1 x0 );
     void usePriorsForStartingPosition( );
     void run();

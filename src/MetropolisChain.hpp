@@ -60,7 +60,7 @@ public:
     M1 getMAPstate( );
     
     // Log-likelihood function --- needs to be implemented by children
-    virtual datatype negLogLikeliFcn( M1 state, std::vector<Prior> prior, int n ) { return 0; };
+    virtual datatype negLogLikeliFcn( M1 state, std::vector<Prior> prior, int n ) = 0;
 };
 
 #endif /* MetropolisChain */
