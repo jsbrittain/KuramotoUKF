@@ -258,7 +258,7 @@ void KuramotoUKF::testTrigonometricApproximations( const string filename ) {
         // Col 2: Cos
         x[k][2] = cosT( x[k][0] );
     }
-    writeMatrixToFile(filename, x, K, 3);
+    writeMatrixToFile(filename, x);
 }
 datatype KuramotoUKF::negLogLikeliFcn( M1 x, std::vector<Prior> prior ) {
     return negLogLikeliFcn( x ) - logLikeliPriors( x, prior );

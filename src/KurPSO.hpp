@@ -17,7 +17,7 @@ public:
     KuramotoUKF kurf;
     
     KurPSO( KuramotoUKF kurf, int paramcount, std::vector<Prior> prior );
-    datatype costFunction( M1 state, std::vector<Prior> prior, int n ) override;
+    datatype costFunction( M1 state, std::vector<Prior> prior ) override;
 };
 
 #endif /* KurPSO_hpp */

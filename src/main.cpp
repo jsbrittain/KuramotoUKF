@@ -86,14 +86,12 @@ int main(int argc, const char * argv[]) {
     KurRecover::Options recopts;
     
     // Check if data folder contain a valid data file...
-    bool generate_surrogate_data = false;
     recopts.loadfile = savedir + "/y.txt";
     if (FILE *file = fopen(recopts.loadfile.c_str(), "r")) {
         // File exists, read in later
         fclose(file);
     } else {
         // ...otherwise, generate data to recover...
-        generate_surrogate_data = true;
         kurrec.generateData( modelparams, savedir );
         recopts.loadfile = savedir + "/gen_y.txt";
         recopts.useRmsSigmay = false;

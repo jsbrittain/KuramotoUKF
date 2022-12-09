@@ -99,7 +99,7 @@ public:
     datatype logLikeliMVN( M1 state, int statedim, M1 mu, M2 Sigma );
     datatype logLikeliMVNpersistent( M1 x, int n, M1 mu, M2 Sigma );
     void testRandomNumberGenerators( const std::string filestem );
-    void writeMatrixToFile( const std::string filename, M2 x, int dim1, int dim2 );
+    void writeMatrixToFile( const std::string filename, M2 x );
     static datatype normLikeli( datatype x, datatype mu, datatype sd );
     static datatype logLikeliPriors( M1 state, std::vector<Prior> prior );
     static void printPriors( std::vector<Prior> prior );

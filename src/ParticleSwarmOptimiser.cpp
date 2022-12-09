@@ -70,7 +70,7 @@ void ParticleSwarmOptimiser::initialise() {
             mvnrand( priorMu, paramcount, priorVariance, particle[k].position );
             mvnrand( zeros,   paramcount, priorVariance, particle[k].velocity );
             // Evaluate cost and assign
-            particle[k].cost = costFunction( particle[k].position, prior, paramcount );
+            particle[k].cost = costFunction( particle[k].position, prior );
         }
         
         // Define neighbours
@@ -163,7 +163,7 @@ void ParticleSwarmOptimiser::run() {
                 particle[k].position[i] = particle[k].position[i] + particle[k].velocity[i];
             }
             // Evaluation
-            particle[k].cost = costFunction( particle[k].position, prior, paramcount );
+            particle[k].cost = costFunction( particle[k].position, prior);
             
             // If cost function is NaN, revert particle to previous best
             if ( std::isnan( particle[k].cost ) ) {

@@ -202,7 +202,7 @@ void KurRecover::parameterRecovery( KuramotoUKF::ModelParamsSimple modelparams, 
     // Run simulation on MAP estimate for final state-vectors
     datatype negloglikeli = kuramoto.negLogLikeliFcn( stateMAP, prior );
     if ( options.verbose ) std::cout << "Writing estimated states to file for log-neg-likeli = " << negloglikeli << std::endl;
-    saveParams( options.savedir + "/out_params.txt", stateMAP, n_priors );
+    saveParams( options.savedir + "/out_params.txt", stateMAP );
     kuramoto.saveStates(      options.savedir + "/out_x.txt"      );
     kuramoto.saveStatesCovar( options.savedir + "/out_xSigma.txt" );
     kuramoto.saveObs(         options.savedir + "/out_y.txt"      );
@@ -210,7 +210,7 @@ void KurRecover::parameterRecovery( KuramotoUKF::ModelParamsSimple modelparams, 
     kuramoto.saveObsCovar(    options.savedir + "/out_ySigma.txt" );
 }
 
-void KurRecover::saveParams( std::string filename, M1 x, int n ) {
+void KurRecover::saveParams(std::string filename, M1 x) {
     MatrixManip::saveVectorToTextFile(filename, x);
 }
 

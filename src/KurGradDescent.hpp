@@ -21,7 +21,7 @@ public:
     KurGradDescent( KuramotoUKF& kurf, int paramcount, std::vector<MatrixManip::Prior> prior );
     KurGradDescent( KuramotoUKF& kurf, int paramcount, std::vector<MatrixManip::Prior> prior, Method method );
     ~KurGradDescent();
-    datatype costFunction( M1 state, std::vector<MatrixManip::Prior> prior, int n ) override;
+    datatype costFunction( M1 state, std::vector<MatrixManip::Prior> prior ) override;
 };
 
 #endif /* KurGradDescent_hpp */

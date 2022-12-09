@@ -72,7 +72,7 @@ void MetropolisChain::run() {
     chaint = 0;
     datatype acceptance_rate;
     clock_t timer = clock();
-    logPcurrent = negLogLikeliFcn( stateCurrent[chaint], prior, statedim );
+    logPcurrent = negLogLikeliFcn( stateCurrent[chaint], prior );
     stateNegLogLikeli[chaint] = logPcurrent;
     if ( verbose ) {
         timer = clock() - timer;
@@ -233,7 +233,7 @@ bool MetropolisChain::step() {
     }
     
     // Determine proposal likelihood
-    logPproposal = negLogLikeliFcn( stateProposal, prior, statedim );
+    logPproposal = negLogLikeliFcn( stateProposal, prior );
     logPcrit = logPcurrent - logPproposal;
     
     // Acceptance criteria

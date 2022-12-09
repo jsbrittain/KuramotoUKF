@@ -12,6 +12,6 @@ KuramotoMCChain::KuramotoMCChain(KuramotoUKF& kurf, MetropolisChainParams mcmcpa
   : kuramotoukf(kurf), MetropolisChain( mcmcparams ) {
     //
 };
-datatype KuramotoMCChain::negLogLikeliFcn( M1 state, std::vector<Prior> prior, int n ) {
+datatype KuramotoMCChain::negLogLikeliFcn( M1 state, std::vector<Prior> prior ) {
     return kuramotoukf.negLogLikeliFcn( state, prior );
 }

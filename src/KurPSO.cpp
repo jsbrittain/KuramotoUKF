@@ -12,6 +12,6 @@ KurPSO::KurPSO( KuramotoUKF kurf, int paramcount, std::vector<Prior> prior )
   : kurf(kurf), ParticleSwarmOptimiser( paramcount, prior ) {
     //
 }
-datatype KurPSO::costFunction( M1 state, std::vector<Prior> prior, int n ) {
+datatype KurPSO::costFunction( M1 state, std::vector<Prior> prior ) {
     return kurf.negLogLikeliFcn( state, prior );
 }

@@ -47,7 +47,18 @@ public:
     datatype logPcurrent, logPproposal, logPcrit;
     
     MetropolisChain( MetropolisChainParams mcmcparams );
-    MetropolisChain( M1 state0, M2 covarProposal, bool tuneProposal, int tuningiters, std::vector<Prior>& prior, int statedim, int randseed, int burnin, int chainlength, int verbose );
+    MetropolisChain(
+        M1 state0,
+        M2 covarProposal,
+        bool tuneProposal,
+        int tuningiters,
+        std::vector<Prior>& prior,
+        int statedim,
+        int randseed,
+        int burnin,
+        int chainlength,
+        int verbose
+      );
     ~MetropolisChain();
     void initialise();
     void run( );
@@ -60,7 +71,7 @@ public:
     M1 getMAPstate( );
     
     // Log-likelihood function --- needs to be implemented by children
-    virtual datatype negLogLikeliFcn( M1 state, std::vector<Prior> prior, int n ) = 0;
+    virtual datatype negLogLikeliFcn( M1 state, std::vector<Prior> prior ) = 0;
 };
 
 #endif /* MetropolisChain */

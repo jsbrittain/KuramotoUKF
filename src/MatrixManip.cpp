@@ -323,13 +323,7 @@ datatype MatrixManip::logLikeliMVNpersistent( M1 x, int n, M1 mu, M2 Sigma ) {
     matmult(persistentLogLikeliMVNeiS, persistentLogLikeliMVNe, persistentLogLikeliMVNMahalanobisSqr);
     return -0.5*( logdetPD(Sigma, n) + persistentLogLikeliMVNMahalanobisSqr[0][0] + n*logtwopi );
 }
-void MatrixManip::writeMatrixToFile( const std::string filename, M2 x, int dim1, int dim2 ) {
-    /*std::ofstream myfile(filename,std::ofstream::binary);
-     for ( int i = 0; i < dim1; i++ ) {
-     for ( int j = 0; j < dim2; j++ )
-     myfile << x[i][j] << '\t';
-     myfile << std::std::endl;
-     }*/
+void MatrixManip::writeMatrixToFile( const std::string filename, M2 x ) {
     saveMatrixToTextFile(filename, x);
 }
 void MatrixManip::testRandomNumberGenerators( const std::string filestem ) {
@@ -340,7 +334,7 @@ void MatrixManip::testRandomNumberGenerators( const std::string filestem ) {
     // Output uniform random numbers to file
     M2 u = allocMatrix(N,1);
     uniformrand(N, 1, u);
-    writeMatrixToFile( filestem + "/test_uniform.txt", u, N, 1 );
+    writeMatrixToFile( filestem + "/test_uniform.txt", u );
     
     // Output MVN (diagonal) to file
     int M = 3;
@@ -350,7 +344,7 @@ void MatrixManip::testRandomNumberGenerators( const std::string filestem ) {
     M2 X = allocMatrix(N, M);
     for ( int n = 0; n < N; n++ )
         mvnrand( mu, M, Sigma, X[n] );
-    writeMatrixToFile( filestem + "/test_mvnDiag.txt", X, N, M );
+    writeMatrixToFile( filestem + "/test_mvnDiag.txt", X );
     
     // Output MVN (covar structure) to file
     M2 Sigma2 = allocMatrix(3,3);
@@ -359,7 +353,7 @@ void MatrixManip::testRandomNumberGenerators( const std::string filestem ) {
     M2 X2 = allocMatrix(N, 3);
     for ( int n = 0; n < N; n++ )
         mvnrand( mu, M, Sigma2, X2[n] );
-    writeMatrixToFile( filestem + "/test_mvnFull.txt", X2, N, 3 );
+    writeMatrixToFile( filestem + "/test_mvnFull.txt", X2 );
 }
 datatype MatrixManip::normLikeli( datatype x, datatype mu, datatype sd ) {
     if ( sd == 0 )

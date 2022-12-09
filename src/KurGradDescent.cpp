@@ -22,6 +22,6 @@ KurGradDescent::~KurGradDescent() {
     //
 }
 
-datatype KurGradDescent::costFunction( M1 state, std::vector<MatrixManip::Prior> prior, int n ) {
+datatype KurGradDescent::costFunction( M1 state, std::vector<MatrixManip::Prior> prior ) {
     return kurf.negLogLikeliFcn( state, prior );
 }

@@ -29,7 +29,7 @@ void GradDescent::run() {
     
     // Check that method is not nullptr (passthrough)
     if ( method == passthrough ) {
-        cost = costFunction(x, prior, paramcount);
+        cost = costFunction(x, prior);
         return;
     }
     
@@ -50,7 +50,7 @@ void GradDescent::run() {
     M1 newcache = MatrixManip::allocMatrix(paramcount);
 
     // Initial conditions
-    cost = costFunction(x, prior, paramcount);
+    cost = costFunction(x, prior);
     if ( verbose ) {
         std::cout << "Iter 0, cost " << cost << std::endl;
     }
@@ -69,7 +69,7 @@ void GradDescent::run() {
                 }
             }
             xp[i] += dx[i]; xm[i] -= dx[i];
-            dCdx[i] = ( costFunction(xp, prior, paramcount) - costFunction(xm, prior, paramcount) )/(2.0*dx[i]);
+            dCdx[i] = ( costFunction(xp, prior) - costFunction(xm, prior) )/(2.0*dx[i]);
         }
         
         // Update position and cost
@@ -113,7 +113,7 @@ void GradDescent::run() {
                 assert(method!=passthrough);
                 break;
         }
-        newcost = costFunction(newx, prior, paramcount);
+        newcost = costFunction(newx, prior);
         
         // Prevent divergence
         lastcost = cost;
@@ -195,7 +195,7 @@ void GradDescent::calcHessian() {
             xmm[i] -= dx[i]; xmm[j] -= dx[j];
             
             // Evaluate Hessian
-            hess[i][j] = ( costFunction(xpp, prior, paramcount) - costFunction(xpm, prior, paramcount) - costFunction(xmp, prior, paramcount) + costFunction(xmm, prior, paramcount) )/(4.0*dx[i]*dx[j]);
+            hess[i][j] = ( costFunction(xpp, prior) - costFunction(xpm, prior) - costFunction(xmp, prior) + costFunction(xmm, prior) )/(4.0*dx[i]*dx[j]);
             if ( i != j )
                 hess[j][i] = hess[i][j];
         }
