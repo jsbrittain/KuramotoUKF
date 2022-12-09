@@ -27,7 +27,7 @@ void KurPSOchains::runThread(
     // Construct Kuromoto UKF
     KuramotoUKF kurf( modelparams.kurfparams );
     kurf.readMeasurementFile(loadfile, 1);
-    //kurf->setPriors( paramPriorList, n_priors, paramcount );
+    kurf.setPriors( paramPriorList, n_priors, paramcount );
     kurf.formPriors( modelparams );
     kurf.initialise();
     kurf.setInitialConditionsFromPriors();
@@ -66,7 +66,20 @@ M1 KurPSOchains::run(
     
     // Call threads
     for ( int threadno = 0; threadno < threadcount; threadno++ )
-        psoThreads[threadno] = std::thread( &KurPSOchains::runThread, this, modelparams, paramcount, prior, paramPriorList, n_priors, loadfile, savedir, maps[threadno], costs[threadno], threadno );
+        psoThreads[threadno] = std::thread(
+            &KurPSOchains::runThread,
+            this,
+            modelparams,
+            paramcount,
+            prior,
+            paramPriorList,
+            n_priors,
+            loadfile,
+            savedir,
+            maps[threadno],
+            costs[threadno],
+            threadno
+          );
     
     // Join threads
     for ( int threadno = 0; threadno < threadcount; threadno++ )

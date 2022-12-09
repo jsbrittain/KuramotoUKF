@@ -41,7 +41,7 @@ M2 MatrixManip::mateye( int n, datatype value ) {
     }
     return I;
 }
-void MatrixManip::mattranspose(M2 A, M2 D) {
+void MatrixManip::mattranspose(M2 A, M2& D) {
     // Matrix transpose
     for (size_t i = 0; i < A.size(); i++) {
         for (size_t j = 0; j < A[i].size(); j++) {
@@ -49,7 +49,7 @@ void MatrixManip::mattranspose(M2 A, M2 D) {
         }
     }
 }
-void MatrixManip::matmult(M2 A, M1 B, M1 D ) {
+void MatrixManip::matmult(M2 A, M1 B, M1& D ) {
     // Matrix multipication --- slowest possible method!
     for (size_t i = 0; i < A.size(); i++) {
         D[i] = 0;
@@ -58,7 +58,7 @@ void MatrixManip::matmult(M2 A, M1 B, M1 D ) {
         }
     }
 }
-void MatrixManip::matmult( M2 A, M2 B, M2 D ) {
+void MatrixManip::matmult( M2 A, M2 B, M2& D ) {
     // Matrix multipication --- slowest possible method!
     for (size_t i = 0; i < A.size(); i++) {
         for (size_t j = 0; j < B[0].size(); j++) {
@@ -75,10 +75,10 @@ void MatrixManip::matmultbyscalar(M2 A, datatype scale, M2& D) {
             D[i][j] = scale*A[i][j];
     }
 }
-void MatrixManip::matdivr( M2 A, M2 B, M2 D ) {
+void MatrixManip::matdivr( M2 A, M2 B, M2& D ) {
     assert( 0 );
 }
-void MatrixManip::matinvByHand2D( M2 A, M2 D ) {
+void MatrixManip::matinvByHand2D( M2 A, M2& D ) {
     datatype invAbsDet;
     invAbsDet = 1.0/fabs(A[0][0]*A[1][1]-A[0][1]*A[1][0]);
     D[0][0] =  invAbsDet*A[1][1];
@@ -100,7 +100,7 @@ void MatrixManip::matinv( M2 A, int n, M2& D ) {
     }
     
 }
-void MatrixManip::matinvPD( M2 A, M2 D ) {
+void MatrixManip::matinvPD( M2 A, M2& D ) {
     // Inverse for Positive Definite Matrices
     int n = A.size();
     
@@ -113,7 +113,7 @@ void MatrixManip::matinvPD( M2 A, M2 D ) {
     mattranspose( Linv, LinvT );
     matmult( LinvT, Linv, D );
 }
-void MatrixManip::matinvDiag( M2 A, M2 D ) {
+void MatrixManip::matinvDiag( M2 A, M2& D ) {
     // Inverse of diagonal matrix
     size_t n = A.size();
     for (size_t i = 0; i < n; i++) {
@@ -123,7 +123,7 @@ void MatrixManip::matinvDiag( M2 A, M2 D ) {
     for (size_t k = 0; k < n; k++)
         D[k][k] = 1.0/A[k][k];
 }
-void MatrixManip::matinvL( M2 L, M2 D ) {
+void MatrixManip::matinvL( M2 L, M2& D ) {
     // Inverse of lower-diagonal matrix
     size_t n = L.size();
     for (size_t i = 0; i < n; i++) {
@@ -150,6 +150,10 @@ void MatrixManip::matadd( M2 A, M2 B, M2& D ) {
     }
 }
 void MatrixManip::printVector( M1 x ) {
+    for (size_t k=0; k<x.size(); k++)
+        std::cout << std::fixed << "    " << k << ": " << x[k] << std::endl;
+}
+void MatrixManip::printVector( std::vector<int> x ) {
     for (size_t k=0; k<x.size(); k++)
         std::cout << std::fixed << "    " << k << ": " << x[k] << std::endl;
 }
@@ -364,7 +368,7 @@ datatype MatrixManip::normLikeli( datatype x, datatype mu, datatype sd ) {
     }
 }
 datatype MatrixManip::logLikeliPriors( M1 state, std::vector<Prior> prior ) {
-    assert(state.size() <= prior.size());
+    assert(state.size() == prior.size());
     datatype logLikeli = 0.0;
     for (size_t k = 0; k<prior.size(); k++)
         logLikeli += normLikeli( state[k], prior[k].mu, prior[k].sd );
@@ -399,10 +403,10 @@ datatype MatrixManip::matrms( M1 x ) {
     rms = sqrt( rms/n );
     return rms;
 }
-void MatrixManip::saveVectorToTextFile( std::string filename, M1 D ) {
+void MatrixManip::saveVectorToTextFile( std::string filename, M1& D ) {
     saveMatrixToTextFile( filename, D );
 }
-void MatrixManip::saveMatrixToTextFile( std::string filename, M1 D ) {
+void MatrixManip::saveMatrixToTextFile( std::string filename, M1& D ) {
     int dim = D.size();
     std::ofstream myfile(filename,std::ofstream::binary);
     myfile << std::scientific << std::setprecision(std::numeric_limits<datatype>::max_digits10);
@@ -426,7 +430,7 @@ M1 MatrixManip::loadVectorFromTextFile( std::string filename, int expected_dim )
         assert( "Cannot open file for reading." );
     return D;
 }
-void MatrixManip::saveMatrixToTextFile( std::string filename, M2 D ) {
+void MatrixManip::saveMatrixToTextFile( std::string filename, M2& D ) {
     int dim1 = D.size(), dim2 = D[0].size();
     // Save matrix to text file: 2-dimensions
     std::ofstream myfile(filename,std::ofstream::binary);
@@ -442,7 +446,7 @@ void MatrixManip::saveMatrixToTextFile( std::string filename, M2 D ) {
     } else
         assert( "Cannot open file for writing." );
 }
-void MatrixManip::saveMatrixToTextFile( std::string filename, M3 D ) {
+void MatrixManip::saveMatrixToTextFile( std::string filename, M3& D ) {
     // Save matrix to text file: 3-dimensions
     int dim1=D.size(), dim2=D[0].size(), dim3=D[0][0].size();
     std::ofstream myfile(filename,std::ofstream::binary);

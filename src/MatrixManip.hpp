@@ -66,19 +66,20 @@ public:
     static void cholesky(M2 A, M2& L);
     static M2 mateye( int n );
     static M2 mateye( int n, datatype value );
-    static void mattranspose( M2 A, M2 D );
-    static void matmult( M2 A, M2 B, M2 D );
-    static void matmult( M2 A, M1 B, M1 D );
+    static void mattranspose( M2 A, M2& D );
+    static void matmult( M2 A, M2 B, M2& D );
+    static void matmult( M2 A, M1 B, M1& D );
     static void matmultbyscalar( M2 A, datatype scale, M2& D );
-    static void matdivr( M2 A, M2 B, M2 D );
-    static void matinvByHand2D( M2 A, M2 D );
+    static void matdivr( M2 A, M2 B, M2& D );
+    static void matinvByHand2D( M2 A, M2& D );
     static void matinv( M2 A, int n, M2& D );
-    static void matinvPD( M2 A, M2 D );
-    static void matinvDiag( M2 A, M2 D );
-    static void matinvL( M2 A, M2 D );
+    static void matinvPD( M2 A, M2& D );
+    static void matinvDiag( M2 A, M2& D );
+    static void matinvL( M2 A, M2& D );
     static void matadd( M2 A, M2 B, M2& D );
     static void matsub( M2 A, M2 B, M2& D );
     static void printVector( M1 x );
+    static void printVector( std::vector<int> x );
     static void printMatrix( M1 X );
     static void printMatrix( M2 X );
     static void outerproduct( M1 x, M2& D );
@@ -104,12 +105,12 @@ public:
     static datatype logLikeliPriors( M1 state, std::vector<Prior> prior );
     static void printPriors( std::vector<Prior> prior );
     static datatype matrms( M1 x );
-    static void saveVectorToTextFile( std::string filename, M1 D );
-    static void saveMatrixToTextFile( std::string filename, M1 D );
+    static void saveVectorToTextFile( std::string filename, M1& D );
+    static void saveMatrixToTextFile( std::string filename, M1& D );
     static M1 loadVectorFromTextFile( std::string filename, int expected_dim );
-    static void saveMatrixToTextFile( std::string filename, M2 D );
+    static void saveMatrixToTextFile( std::string filename, M2& D );
     static M2 loadMatrixFromTextFile( std::string filename, int expected_dim1, int expected_dim2 );
-    static void saveMatrixToTextFile( std::string filename, M3 D );
+    static void saveMatrixToTextFile( std::string filename, M3& D );
 };
 
 #endif

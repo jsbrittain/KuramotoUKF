@@ -1,5 +1,5 @@
 CC = g++
-FLAGS = -std=c++17 -Wall -Wextra -Wno-reorder -c
+FLAGS = -std=c++17 -g3 -Wall -Wextra -Wno-reorder -c
 
 SOURCEDIR = .
 BUILDDIR = ../build
@@ -9,12 +9,10 @@ EXECUTABLE = kukf
 SOURCES = $(wildcard $(SOURCEDIR)/*.cpp)
 OBJECTS = $(patsubst $(SOURCEDIR)/%.cpp,$(OBJDIR)/%.o,$(SOURCES))
 
-all: dir $(BUILDDIR)/$(EXECUTABLE)
+all: dir $(BUILDDIR)/$(EXECUTABLE) tags
 
 dir:
 	mkdir -p $(BUILDDIR) $(OBJDIR)
-
-debug: FLAGS += -DDEBUG -g
 
 $(BUILDDIR)/$(EXECUTABLE): $(OBJECTS)
 	$(CC) -g $^ -o $@
@@ -22,6 +20,9 @@ $(BUILDDIR)/$(EXECUTABLE): $(OBJECTS)
 $(OBJECTS): $(OBJDIR)/%.o : $(SOURCEDIR)/%.cpp
 	$(CC) $(FLAGS) $< -o $@
 
+tags:
+	ctags *.cpp *.hpp
+
 .PHONY: clean
 clean:
-	rm -f $(OBJDIR)/*.o $(BUILDDIR)/$(EXECUTABLE)
+	rm -f $(OBJDIR)/*.o $(BUILDDIR)/$(EXECUTABLE) tags
