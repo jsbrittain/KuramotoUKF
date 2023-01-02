@@ -1,0 +1,46 @@
+#pragma once
+
+#include<vector>
+#include<iostream>
+#include<algorithm>
+
+template<typename T, int order> class Matrix;  // pre-declare the template class itself
+template<typename T, int order> std::ostream& operator<< (std::ostream& o, const Matrix <T, order>& x);
+
+template<typename T, int order>
+class Matrix {
+private:
+  // Templated Matrix type definition (recursive vectors)
+  template<int dims>
+  struct Matrix_s {
+    using type = std::vector<typename Matrix_s<dims-1>::type>;
+  };
+  template<>
+  struct Matrix_s<0> {
+    using type = T;
+  };
+  template<int dims>
+  using Matrix_t = typename Matrix_s<dims>::type;
+
+  // Container
+  std::vector<int> dim_size;
+  Matrix_t<order> M;
+
+public:
+  Matrix(std::vector<int> dim_size);
+  friend std::ostream& operator<< <>(std::ostream& os, const Matrix<T, order>& m);
+  Matrix_t<order-1> operator[](int index);
+
+private:
+  template<int dim>
+  Matrix_t<dim> init_matrix(std::vector<int> dim_size) {
+    return std::vector<Matrix_t<dim-1>>(dim_size[dim-1], init_matrix<dim-1>(dim_size));
+  };
+  template<>
+  T init_matrix<0>(std::vector<int> dim_size) {
+    return T();
+  }
+  std::ostream& printMatrix(std::ostream& os) const;
+};
+
+#include "Matrix.inl"
